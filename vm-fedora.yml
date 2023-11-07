@@ -86,6 +86,7 @@ spec:
               chpasswd: { expire: False }
             packages:
              - podman
+             - socat
           name: cloudinitdisk
         - dataVolume:
             name: fedora37
