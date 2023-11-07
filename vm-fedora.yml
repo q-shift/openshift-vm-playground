@@ -84,6 +84,8 @@ spec:
               user: fedora
               password: rhpass
               chpasswd: { expire: False }
+            packages:
+             - podman
           name: cloudinitdisk
         - dataVolume:
             name: fedora37
