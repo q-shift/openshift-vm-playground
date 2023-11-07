@@ -6,7 +6,7 @@
 
 ## Instructions to create a VM and to ssh to it
 
-- Log on to an OCP 4.13 cluster and install the Openshift virtualization operator
+- Log on to an OCP 4.13 cluster, install the Openshift virtualization operator and create a `HyperConverged` CR using the defaults
 - Create or select a project/namespace
 ```bash
 oc new-project development
@@ -32,6 +32,7 @@ sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 UNIX-SOCKET:/var/run/u
 ```
 then from a pod running a docker/podman client, you will be able to access the daemon
 ```bash
+kubectl apply -n development -f podman-client.yml
 kubectl exec -n development podman-client  -it -- /bin/sh
 sh-5.2# export DOCKER_HOST=tcp://fedora37:2376
 sh-5.2# podman pull hello-world 
