@@ -77,7 +77,13 @@ spec:
     - name: DOCKER_HOST
       type: string
       description: The docker host (e.g. tcp://hostvm.mynamspace:2376).
-      default: "tcp://fedora-podman-remote:2376"
+      default: "tcp://fedora37:2376"
+    - name: TESTCONTAINERS_RYUK_DISABLED
+      type: string
+      description: >-
+        Disable the ryuk container to avoid issues with the
+        docker-in-docker container.
+      default: "true"
   steps:
     - name: mvn-settings
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
