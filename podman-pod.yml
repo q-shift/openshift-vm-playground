@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podman-client
+spec:
+  containers:
+    - name: podman-client
+      image: quay.io/podman/stable
+      args:
+        - sleep
+        - "1000000"
+      securityContext:
+        capabilities:
+          add:
+            - "SYS_ADMIN"
+            - "MKNOD"
+            - "SYS_CHROOT"
+            - "SETFCAP"
