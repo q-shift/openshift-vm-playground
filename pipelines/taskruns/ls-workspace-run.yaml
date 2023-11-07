@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: ls-workspace-run
+spec:
+  taskRef:
+    name: ls-workspace
+  workspaces:
+    - name: project-dir
+      persistentVolumeClaim:
+        claimName: project-pvc

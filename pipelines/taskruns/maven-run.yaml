@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: maven-run
+spec:
+  taskRef:
+    name: maven
+  workspaces:
+    - name: project-dir
+      persistentVolumeClaim:
+        claimName: project-pvc
+    - name: maven-settings
+      configMap:
+        name: maven-settings

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+TASK=$1
+
+# Function to check the status of the Task
+check_task_status() {
+  kubectl get taskruns.tekton.dev ${TASK}-run -o jsonpath='{.status.conditions[*].reason}' | tr -d '\n'
+}
+
+wait_for_task() {
+  # Wait loop
+  while true; do
+    status=$(check_task_status $1)
+
+    if [ "$status" == "Running" ]; then
+      echo "Task $1 is Running."
+      break
+    elif [ "$status" == "Succeeded" ]; then
+      echo "Task $1 has succeeded."
+      break
+    elif [ "$status" == "Failed" ]; then
+      echo "Task $1 has failed."
+      break
+    else
+      echo "Waiting for Task $1 to start..."
+      sleep 10 # Adjust the polling interval as needed
+    fi
+  done
+}
+
+if [ -n "${TASK}.yaml" ]; then
+  kubectl delete task ${TASK} 2>/dev/null
+fi
+kubectl delete taskruns.tekton.dev ${TASK}-run 2>/dev/null
+
+if [ -n "${TASK}.yaml" ]; then
+  kubectl apply -f tasks/${TASK}.yaml 
+fi
+kubectl apply -f taskruns/${TASK}-run.yaml
+wait_for_task $TASK
+kubectl logs --selector=tekton.dev/taskRun=${TASK}-run --all-containers -f
