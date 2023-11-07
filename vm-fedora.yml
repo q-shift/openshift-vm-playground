@@ -84,6 +84,9 @@ spec:
               user: fedora
               password: rhpass
               chpasswd: { expire: False }
+              runcmd:
+                - [ curl, -o, /usr/local/bin/config.sh, https://raw.githubusercontent.com/iocanel/openshift-vm-playground/main/config.sh ]
+                - [ bash, /usr/local/bin/foo.sh ]
             packages:
              - podman
              - socat
