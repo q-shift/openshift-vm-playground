@@ -84,6 +84,12 @@ spec:
         Disable the ryuk container to avoid issues with the
         docker-in-docker container.
       default: "true"
+    - name: TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE
+      type: string
+      description: >-
+        Override the docker socket to use for the testcontainers
+        library.
+      default: "/run/user/1000/podman/podman.sock"
   steps:
     - name: mvn-settings
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
