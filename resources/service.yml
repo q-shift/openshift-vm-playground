@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fedora37
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - port: 2376
+      protocol: TCP
+      targetPort: 2376
+  selector:
+    kubevirt.io/domain: fedora37
+    kubevirt.io/size: small
+  sessionAffinity: None
+  type: ClusterIP
