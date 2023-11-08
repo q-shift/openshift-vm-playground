@@ -7,7 +7,7 @@ spec:
     name: maven
   params:
     - name: DOCKER_HOST
-      value: tcp://$(tasks.virtualmachine.results.ip):2376
+      value: "tcp://$(tasks.virtualmachine.results.ip):2376"
   workspaces:
     - name: project-dir
       persistentVolumeClaim:
