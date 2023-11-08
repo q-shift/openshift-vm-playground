@@ -77,7 +77,7 @@ spec:
     - name: DOCKER_HOST
       type: string
       description: The docker host (e.g. tcp://hostvm.mynamspace:2376).
-      default: "tcp://fedora37.development.svc.cluster.local:2376"
+      default: "tcp://fedora37:2376"
     - name: TESTCONTAINERS_RYUK_DISABLED
       type: string
       description: >-

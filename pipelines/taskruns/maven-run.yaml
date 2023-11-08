@@ -5,6 +5,9 @@ metadata:
 spec:
   taskRef:
     name: maven
+  params:
+    - name: DOCKER_HOST
+      value: tcp://10.128.2.169:2376
   workspaces:
     - name: project-dir
       persistentVolumeClaim:

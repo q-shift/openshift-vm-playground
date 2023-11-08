@@ -16,3 +16,4 @@ spec:
             - "MKNOD"
             - "SYS_CHROOT"
             - "SETFCAP"
+            - "NET_RAW"
