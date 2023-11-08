@@ -60,13 +60,26 @@ virtctl ssh --local-ssh fedora@fedora37
 
 To access podman remotely, it is needed to expose the daemon host using socat within the Fedora VM
 ```bash
-sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 UNIX-SOCKET:/run/user/1000/podman/podman.sock
+sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock
 ```
 then from a pod running a docker/podman client, you will be able to access the daemon
 ```bash
 kubectl apply -n development -f podman-pod.yml
 kubectl exec -n development podman-client  -it -- /bin/sh
+sh-5.2# podman -r --url=tcp://fedora37.development.svc.cluster.local:2376 ps
+CONTAINER ID  IMAGE       COMMAND     CREATED     STATUS      PORTS       NAMES
+
 sh-5.2# podman -r --url=tcp://fedora37.development.svc.cluster.local:2376 images
+REPOSITORY  TAG         IMAGE ID    CREATED     SIZE
+
+sh-5.2# podman -r --url=tcp://fedora37.development.svc.cluster.local:2376 pull hello-world
+Resolved "hello-world" as an alias (/etc/containers/registries.conf.d/000-shortnames.conf)
+Trying to pull quay.io/podman/hello:latest...
+Getting image source signatures
+Copying blob sha256:d08b40be68780d583e8c127f10228743e3e1beb520f987c0e32f4ef0c0ce8020
+Copying config sha256:e2b3db5d4fdf670b56dd7138d53b5974f2893a965f7d37486fbb9fcbf5e91d9d
+Writing manifest to image destination
+e2b3db5d4fdf670b56dd7138d53b5974f2893a965f7d37486fbb9fcbf5e91d9d
 ```          
 
 ## TODO

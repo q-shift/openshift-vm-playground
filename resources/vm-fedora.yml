@@ -88,7 +88,7 @@ spec:
                - podman
                - socat
               runcmd:
-                - curl -o /usr/local/bin/config.sh https://raw.githubusercontent.com/iocanel/openshift-vm-playground/main/config.sh
+                - curl -o /usr/local/bin/config.sh https://raw.githubusercontent.com/iocanel/openshift-vm-playground/main/resources/config.sh
                 - bash /usr/local/bin/config.sh
           name: cloudinitdisk
         - dataVolume:
