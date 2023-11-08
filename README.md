@@ -6,7 +6,11 @@
 
 ## Instructions to create a VM and to ssh to it
 
-- Log on to an OCP 4.13 cluster, install the Openshift virtualization operator and create a `HyperConverged` CR using the defaults
+- Log on to an OCP 4.13 cluster, install the Openshift virtualization operator 
+- Deploy the `HyperConverged` CR to enable the nested virtualization feature:
+```bash
+kubectl apply -f resources/hyperconverged.yml
+```
 - Create or select a project/namespace
 ```bash
 oc new-project development
@@ -24,7 +28,7 @@ kubectl apply -n development -f resources/vm-fedora.yml
 ```bash
 virtctl ssh --local-ssh fedora@fedora37
 ```
-- To access the Virtual Machine and more precisely the podman daemon running at the address 2376 from a pod running within the same cluster, it is needed to create a kubernetes service
+- To access the Virtual Machine and more precisely the podman daemon running at the address 2376 from a pod running within the same cluster, it is needed to create a kubernetes service (optional)
 ```bash
 kubectl apply -n development -f resources/service.yml
 ```
@@ -38,7 +42,7 @@ sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/po
 ```
 then from a pod running a docker/podman client, you will be able to access the daemon
 ```bash
-kubectl apply -n development -f podman-pod.yml
+kubectl apply -n development -f resources/podman-pod.yml
 kubectl exec -n development podman-client  -it -- /bin/sh
 sh-5.2# podman -r --url=tcp://fedora37.development.svc.cluster.local:2376 ps
 CONTAINER ID  IMAGE       COMMAND     CREATED     STATUS      PORTS       NAMES
