@@ -5,15 +5,8 @@ DOCKER_HOST_NAME=$2
 
 if [ $# -eq 0 ]
   then
-    echo "No arguments supplied"
+    echo "No task name supplied (e.g. git-clone, maven, etc)"
 fi
-
-if [ -z "$2" ]
-  then
-    echo "IP address of the docker host running within the VM not specified as 2nd argument"
-fi
-
-sed -i '' "s/DOCKER_HOST_NAME/$DOCKER_HOST_NAME/g" taskruns/maven-run.yaml
 
 # Function to check the status of the Task
 check_task_status() {
