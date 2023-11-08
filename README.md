@@ -15,6 +15,12 @@ oc new-project development
 ```bash
 kubectl create secret generic fedora-ssh-key -n development --from-file=key=~/.ssh/shared_vm_rsa.pub                  
 ```
+- Set a network bridge to allow pods to access the VM within the cluster
+```bash
+kubectl apply -n development -f network-bridge.yml
+```
+**NOTE**: Don't create the bridge using the UI as documented [here](https://github.com/rhpds/roadshow_ocpvirt_instructions/blob/summit/workshop/content/06_network_management.adoc) as you will get the following error `0/6 nodes are available: 3 Insufficient devices.kubevirt.io/kvm, 3 Insufficient devices.kubevirt.io/tun, 3 Insufficient devices.kubevirt.io/vhost-net, 3 node(s) didn't match node selector, 6 Insufficient bridge-cni.network.kubevirt.io/br1`. To fix it, remove the annotation: https://bugzilla.redhat.com/show_bug.cgi?id=1727810
+
 - When done, deploy a VirtualMachine within the namespace `development`
 ```bash
 kubectl delete -n development vm/fedora37
@@ -32,7 +38,7 @@ sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 UNIX-SOCKET:/var/run/u
 ```
 then from a pod running a docker/podman client, you will be able to access the daemon
 ```bash
-kubectl apply -n development -f podman-client.yml
+kubectl apply -n development -f podman-pod.yml
 kubectl exec -n development podman-client  -it -- /bin/sh
 sh-5.2# export DOCKER_HOST=tcp://fedora37:2376
 sh-5.2# podman pull hello-world 
