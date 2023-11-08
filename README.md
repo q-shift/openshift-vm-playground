@@ -15,38 +15,6 @@ oc new-project development
 ```bash
 kubectl create secret generic fedora-ssh-key -n development --from-file=key=~/.ssh/shared_vm_rsa.pub                  
 ```
-- Set a network bridge to allow pods to access the VM within the cluster
-```bash
-kubectl apply -n development -f resources/network-bridge.yml
-```
-**NOTE**: Don't create the bridge using the UI as documented [here](https://github.com/rhpds/roadshow_ocpvirt_instructions/blob/summit/workshop/content/06_network_management.adoc) as you will get the following error `0/6 nodes are available: 3 Insufficient devices.kubevirt.io/kvm, 3 Insufficient devices.kubevirt.io/tun, 3 Insufficient devices.kubevirt.io/vhost-net, 3 node(s) didn't match node selector, 6 Insufficient bridge-cni.network.kubevirt.io/br1`. To fix it, remove the annotation: https://bugzilla.redhat.com/show_bug.cgi?id=1727810
-
-TODO: Instructions to be reviewed as the bridge is not needed but instead a kubernetes service that we can create using the [command below](https://kubevirt.io/user-guide/virtual_machines/service_objects/#service-objects)
-```bash
-virtctl expose vmi fedora37 --name=fedora37 --port=2376 --target-port=2376
-```
-which corresponds to the following yaml
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: fedora37
-  namespace: development
-spec:
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - port: 2376
-    protocol: TCP
-    targetPort: 2376
-  selector:
-    kubevirt.io/domain: fedora37
-    kubevirt.io/size: small
-  sessionAffinity: None
-  type: ClusterIP
-```
 - When done, deploy a VirtualMachine within the namespace `development`
 ```bash
 kubectl delete -n development vm/fedora37
@@ -56,6 +24,12 @@ kubectl apply -n development -f resources/vm-fedora.yml
 ```bash
 virtctl ssh --local-ssh fedora@fedora37
 ```
+- To access the Virtual Machine and more precisely the podman daemon running at the address 2376 from a pod running within the same cluster, it is needed to create a kubernetes service
+```bash
+kubectl apply -n development -f resources/service.yml
+```
+**NOTE**: We can also create a service using the virtctl client: `virtctl expose vmi fedora37 --name=fedora37 --port=2376 --target-port=2376`
+
 ## Access podman remotely
 
 To access podman remotely, it is needed to expose the daemon host using socat within the Fedora VM
@@ -80,12 +54,18 @@ Copying blob sha256:d08b40be68780d583e8c127f10228743e3e1beb520f987c0e32f4ef0c0ce
 Copying config sha256:e2b3db5d4fdf670b56dd7138d53b5974f2893a965f7d37486fbb9fcbf5e91d9d
 Writing manifest to image destination
 e2b3db5d4fdf670b56dd7138d53b5974f2893a965f7d37486fbb9fcbf5e91d9d
-```          
-
-## TODO
-
-To be reviewed and to determine if we need them
-- Create a `NetworkAttachmentDefinition` resource to access the VM
-```bash
-kubectl apply -n development -f network-attachment-def.yml
 ```
+
+## Build a Quarkus application using Tekton
+
+TODO
+
+
+
+## Issues
+
+The step to setup a network bridge is not needed to allow the pods to access the VM within the cluster as a Kuybernetes Service is required in this case
+When we tried to use the `Network Attachment Definition`een faced to the following error: `0/6 nodes are available: 3 Insufficient devices.kubevirt.io/kvm, 3 Insufficient devices.kubevirt.io/tun, 3 Insufficient devices.kubevirt.io/vhost-net, 3 node(s) didn't match node selector, 6 Insufficient bridge-cni.network.kubevirt.io/br1`. 
+To fix it, follow the instructions described within this ticket: https://bugzilla.redhat.com/show_bug.cgi?id=1727810
+
+**TIP**: Don't create using ocp 4.13.x the bridge using the UI as documented [here](https://github.com/rhpds/roadshow_ocpvirt_instructions/blob/summit/workshop/content/06_network_management.adoc) 
