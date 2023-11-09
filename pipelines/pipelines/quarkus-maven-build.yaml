@@ -64,7 +64,7 @@ spec:
           values: [ "true" ]
       params:
         - name: dockerHost
-          value: $(tasks.virtualmachine.results.ip)"
+          value: $(tasks.virtualmachine.results.ip)
       taskSpec:
         params:
           - name: dockerHost
@@ -74,16 +74,18 @@ spec:
           - name: create-container
             image: ghcr.io/ch007m/podman-client
             script: |
-              #!/usr/bin/env bash
+              echo "Creating a container against daemon host: $(params.dockerHost)."
+              PODMAN_CMD="podman -r --url=tcp://$(params.dockerHost):2376"
               
-              echo "Getting podman information for host: $(params.dockerHost)"
-              REMOTE_PARAMS="-r --url=tcp://$(params.dockerHost):2376"
+              $PODMAN_CMD run -i --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
 
-              podman -r --url=tcp://10.128.2.169:2376 run -i --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
+              # CONTAINER_ID=$($PODMAN_CMD ps -f name=my-postgres --format=json | jq -r '.[] | .Id')
+              # $PODMAN_CMD kill $CONTAINER_ID
+              # $PODMAN_CMD rm $CONTAINER_ID
 
     - name: maven
       runAfter:
-        - virtualmachineqq
+        - virtualmachine
       taskRef:
         name: maven
       params:
