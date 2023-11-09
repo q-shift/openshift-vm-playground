@@ -1,0 +1,62 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: quarkus-maven-build
+spec:
+  params:
+    - name: url
+      type: string
+      description: url of the git repository to clone
+    - name: virtualMachineName
+      type: string
+      description: name of the virtual machine to use
+  workspaces:
+    - name: project-dir
+    - name: maven-settings
+  tasks:
+    - name: rm-workspace
+      taskRef:
+        name: rm-workspace
+      workspaces:
+        - name: project-dir
+          workspace: project-dir
+    - name: git-clone
+      runAfter:
+        - rm-workspace
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.url)
+      workspaces:
+        - name: project-dir
+          workspace: project-dir
+    - name: ls-workspace
+      runAfter:
+        - git-clone
+      taskRef:
+        name: ls-workspace
+      workspaces:
+        - name: project-dir
+          workspace: project-dir
+    - name: virtualmachine
+      runAfter:
+        - ls-workspace
+      taskRef:
+        name: virtualmachine
+      params:
+        - name: name
+          value: $(params.virtualMachineName)
+    - name: maven
+      runAfter:
+        - virtualmachine
+      taskRef:
+        name: maven
+      params:
+        - name: DOCKER_HOST
+          value: "tcp://$(tasks.virtualmachine.results.ip):2376"
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: project-dir
+          workspace: project-dir

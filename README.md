@@ -64,8 +64,30 @@ e2b3db5d4fdf670b56dd7138d53b5974f2893a965f7d37486fbb9fcbf5e91d9d
 
 TODO
 
+First create the pvc used to git clone and build quarkus
+```bash
+cd pipelines 
+kubectl apply -f setup/persistentvolumeclaim-project-pvc.yaml
+```
 
+Next, deploy the pipeline and pipelineRun to build the Quarkus application
+```bash
+kubectl delete pipelinerun/quarkus-maven-build-run
+kubectl delete pipeline/quarkus-maven-build
+kubectl delete task/git-clone
+kubectl delete task/maven
+kubectl delete task/rm-workspace
+kubectl delete task/virtualmachine
+kubectl delete task/ls-workspace
 
+kubectl apply -f tasks/git-clone.yaml
+kubectl apply -f tasks/rm-workspace.yaml
+kubectl apply -f tasks/ls-workspace.yaml
+kubectl apply -f tasks/maven.yaml
+kubectl apply -f tasks/virtualmachine.yaml
+kubectl apply -f pipelines/quarkus-maven-build.yaml
+kubectl apply -f pipelineruns/quarkus-maven-build-run.yaml
+```
 ## Issues
 
 The step to setup a network bridge is not needed to allow the pods to access the VM within the cluster as a Kuybernetes Service is required in this case
