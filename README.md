@@ -91,7 +91,7 @@ kubectl apply -f pipelineruns/quarkus-maven-build-run.yaml
 ```
 You can follow the pipeline execution using the following command:
 ```bash
-tkn pr logs quarkus-maven-build-run
+tkn pr logs quarkus-maven-build-run -f
 ```
 
 **NOTE**: If you experiment an issue with the `podman -r run`, you can then modify the `create-remote-container` included within the pipeline `quarkus-maven-build` and set the parameter `debug` to `true` within the PipelineRun `quarkus-maven-build-run`
