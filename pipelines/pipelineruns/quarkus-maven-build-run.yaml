@@ -7,7 +7,7 @@ spec:
     name: quarkus-maven-build
   params:
     - name: debug
-      value: "true"
+      value: "false"
     - name: url
       value: "https://github.com/iocanel/quarkus-helloworld"
     - name: virtualMachineName

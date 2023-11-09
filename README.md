@@ -3,6 +3,7 @@
 ## Prerequisites
 
 - [virtctl](https://docs.openshift.com/container-platform/4.13/virt/virt-using-the-cli-tools.html#installing-virtctl_virt-using-the-cli-tools) client
+- [Tekton client](https://tekton.dev/docs/cli/)
 
 ## Instructions to create a VM and to ssh to it
 
@@ -88,6 +89,13 @@ kubectl apply -f tasks/virtualmachine.yaml
 kubectl apply -f pipelines/quarkus-maven-build.yaml
 kubectl apply -f pipelineruns/quarkus-maven-build-run.yaml
 ```
+You can follow the pipeline execution using the following command:
+```bash
+tkn pr logs quarkus-maven-build-run
+```
+
+**NOTE**: If you experiment an issue with the `podman -r run`, you can then modify the `create-remote-container` included within the pipeline `quarkus-maven-build` and set the parameter `debug` to `true` within the PipelineRun `quarkus-maven-build-run`
+
 ## Issues
 
 The step to setup a network bridge is not needed to allow the pods to access the VM within the cluster as a Kuybernetes Service is required in this case
