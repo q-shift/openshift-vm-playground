@@ -88,8 +88,8 @@ spec:
       type: string
       description: >-
         Override the docker socket to use for the testcontainers
-        library.
-      default: "/run/user/1000/podman/podman.sock"
+        library. Defaulting to rootfull
+      default: "/run/podman/podman.sock"
   steps:
     - name: mvn-settings
       image: registry.access.redhat.com/ubi8/ubi-minimal:8.2

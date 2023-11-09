@@ -10,6 +10,8 @@ spec:
       value: "https://github.com/iocanel/quarkus-helloworld"
     - name: virtualMachineName
       value: "fedora37"
+    - name: testContainersDockerSocketOverride
+      value: "/run/user/1000/podman/podman.sock"
   workspaces:
     - name: project-dir
       persistentVolumeClaim:

@@ -10,6 +10,9 @@ spec:
     - name: virtualMachineName
       type: string
       description: name of the virtual machine to use
+    - name: testContainersDockerSocketOverride
+      type: string
+      description: docker socket to override for test container
   workspaces:
     - name: project-dir
     - name: maven-settings
@@ -55,6 +58,8 @@ spec:
       params:
         - name: DOCKER_HOST
           value: "tcp://$(tasks.virtualmachine.results.ip):2376"
+        - name: TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE
+          value: $(params.testContainersDockerSocketOverride)
       workspaces:
         - name: maven-settings
           workspace: maven-settings
