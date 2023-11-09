@@ -72,11 +72,14 @@ spec:
             type: string
         steps:
           - name: create-container
-            image: quay.io/podman/stable
+            image: ghcr.io/ch007m/podman-client:latest
             script: |
               #!/usr/bin/env bash
               echo "tcp://$(params.dockerHost):2376"
-              podman -r --url=tcp://$(params.dockerHost):2376 run -it --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
+              
+              podman -r --url="tcp://$(params.dockerHost):2376" version
+              podman -r --url="tcp://$(params.dockerHost):2376" run -it --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
+              
               echo "Done !"
 
     - name: maven

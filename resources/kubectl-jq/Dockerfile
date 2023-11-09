@@ -1,3 +1,5 @@
+#  docker build . -t ghcr.io/ch007m/kubectl-jq
+#  docker push ghcr.io/ch007m/kubectl-jq
 FROM quay.io/swsmirror/bash
 
 RUN apk --no-cache add curl jq
