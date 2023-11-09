@@ -6,6 +6,8 @@ spec:
   pipelineRef:
     name: quarkus-maven-build
   params:
+    - name: debug
+      value: "true"
     - name: url
       value: "https://github.com/iocanel/quarkus-helloworld"
     - name: virtualMachineName

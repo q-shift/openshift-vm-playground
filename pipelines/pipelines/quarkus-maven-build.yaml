@@ -10,6 +10,10 @@ spec:
     - name: virtualMachineName
       type: string
       description: name of the virtual machine to use
+    - description: A boolean indicating whether we would like to execute a task
+      default: "false"
+      name: debug
+      type: string
   workspaces:
     - name: project-dir
     - name: maven-settings
@@ -20,6 +24,7 @@ spec:
       workspaces:
         - name: project-dir
           workspace: project-dir
+
     - name: git-clone
       runAfter:
         - rm-workspace
@@ -31,6 +36,7 @@ spec:
       workspaces:
         - name: project-dir
           workspace: project-dir
+
     - name: ls-workspace
       runAfter:
         - git-clone
@@ -39,6 +45,7 @@ spec:
       workspaces:
         - name: project-dir
           workspace: project-dir
+
     - name: virtualmachine
       runAfter:
         - ls-workspace
@@ -47,6 +54,31 @@ spec:
       params:
         - name: name
           value: $(params.virtualMachineName)
+
+    - name: create-remote-container
+      runAfter:
+        - virtualmachine
+      when:
+        - input: $(params.debug)
+          operator: in
+          values: [ "true" ]
+      params:
+        - name: dockerHost
+          value: $(tasks.virtualmachine.results.ip)"
+      taskSpec:
+        params:
+          - name: dockerHost
+            description: docker host to use
+            type: string
+        steps:
+          - name: create-container
+            image: quay.io/podman/stable
+            script: |
+              #!/usr/bin/env bash
+              echo "tcp://$(params.dockerHost):2376"
+              podman -r --url=tcp://$(params.dockerHost):2376 run -it --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
+              echo "Done !"
+
     - name: maven
       runAfter:
         - virtualmachine
