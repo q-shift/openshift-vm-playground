@@ -23,7 +23,7 @@ kubectl create secret generic fedora-ssh-key -n development --from-file=key=~/.s
 - When done, deploy a VirtualMachine within the namespace `development`
 ```bash
 kubectl delete -n development vm/fedora37
-kubectl apply -n development -f resources/vm-fedora.yml
+kubectl apply -n development -f resources/vm-fedora37.yml
 ```
 - When the VM is running, you can ssh using the following command
 ```bash
