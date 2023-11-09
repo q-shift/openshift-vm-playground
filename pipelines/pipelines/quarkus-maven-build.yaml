@@ -72,19 +72,18 @@ spec:
             type: string
         steps:
           - name: create-container
-            image: ghcr.io/ch007m/podman-client:latest
+            image: ghcr.io/ch007m/podman-client
             script: |
               #!/usr/bin/env bash
-              echo "tcp://$(params.dockerHost):2376"
               
-              podman -r --url="tcp://$(params.dockerHost):2376" version
-              podman -r --url="tcp://$(params.dockerHost):2376" run -it --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
-              
-              echo "Done !"
+              echo "Getting podman information for host: $(params.dockerHost)"
+              REMOTE_PARAMS="-r --url=tcp://$(params.dockerHost):2376"
+
+              podman -r --url=tcp://10.128.2.169:2376 run -i --name my-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
 
     - name: maven
       runAfter:
-        - virtualmachine
+        - virtualmachineqq
       taskRef:
         name: maven
       params:
