@@ -1,7 +1,7 @@
 #!/bin/bash
 
-sudo systemctl --user enable --now podman.socket
-sudo loginctl enable-linger 1000
+systemctl --user enable --now podman.socket
+loginctl enable-linger 1000
 
 sudo modprobe iptable-nat
 
