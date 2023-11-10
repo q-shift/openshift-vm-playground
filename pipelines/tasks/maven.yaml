@@ -77,13 +77,13 @@ spec:
     - name: DOCKER_HOST
       type: string
       description: The docker host (e.g. tcp://hostvm.mynamspace:2376).
-      default: "tcp://fedora37:2376"
+      default: "tcp://localhost:2376"
     - name: TESTCONTAINERS_RYUK_DISABLED
       type: string
       description: >-
-        Disable the ryuk container to avoid issues with the
+        Disable the ryuk container able to kill the containers created during the test to avoid issues with the
         docker-in-docker container.
-      default: "true"
+      default: "false"
     - name: TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE
       type: string
       description: >-
