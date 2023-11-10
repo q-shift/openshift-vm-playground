@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sudo dnf -y install podman socat
 systemctl --user enable --now podman.socket
 loginctl enable-linger 1000
 
