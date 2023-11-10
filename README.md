@@ -31,7 +31,6 @@ virtctl ssh --local-ssh fedora@fedora38
 ```
 ## Build a Quarkus application using Tekton
 
-
 First create the pvc used to git clone and build quarkus
 ```bash
 cd pipelines 
