@@ -22,7 +22,7 @@ NAMESPACE=$1
 VM_NAME=$2
 PUBLIC_KEY_FILE_PATH=$3
 
-# Continue with the rest of your script using $namespace and $vm_name
+# Continue with the rest of your script using $NAMESPACE and $VM_NAME
 echo "VM Name: $VM_NAME"
 
 # Check if the namespace exists
@@ -54,6 +54,41 @@ kubectl apply -f resources/vm-$VM_NAME.yml
 # Wait till socat is up and running
 #VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
 #while true; do virtctl -n $NAMESPACE ssh --known-hosts $HOME/.ssh/known_hosts --local-ssh fedora@$VM_NAME -c "sudo netstat -tulpn | grep \":$port.*socat\"" && break; sleep 30; done
+
+desired_state="Running"
+timeout_seconds=300  # Set your desired timeout value
+start_time=$(date +%s)
+
+# Wait for the VirtualMachineInstance to be ready and in the desired state
+set -x
+while true; do
+    # Get the VMI status in JSON format
+    vmi_status=$(kubectl get vmi -n "$NAMESPACE" "$VM_NAME" -o json)
+
+    # Check if VMI exists
+    if [ -n "$vmi_status" ]; then
+        # Check if the VMI is in the desired state
+        vmi_phase=$(echo "$vmi_status" | jq -r '.status.phase')
+        if [ "$vmi_phase" == "$desired_state" ]; then
+            echo "VMI $VM_NAME is now in the '$desired_state' state."
+            break
+        else
+            echo "VMI $VM_NAME is in the '$vmi_phase' state. Waiting..."
+        fi
+    else
+        echo "VMI $VM_NAME does not exist. Waiting..."
+    fi
+
+    # Check if the timeout has been reached
+    current_time=$(date +%s)
+    elapsed_time=$((current_time - start_time))
+    if [ "$elapsed_time" -ge "$timeout_seconds" ]; then
+        echo "Timeout reached. Exiting."
+        break
+    fi
+
+    sleep 10  # Adjust the sleep interval as needed
+done
 
 # Get the VM_IP
 VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
