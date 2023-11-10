@@ -67,7 +67,8 @@ tkn pr logs quarkus-maven-build-run -f
 
 To access podman remotely, it is needed to expose the daemon host using socat within the Fedora VM
 ```bash
-sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock
+sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/user/1000/podman/podman.sock  # rootless for user 1000
+sh-5.2# socat TCP-LISTEN:2376,reuseaddr,fork,bind=0.0.0.0 unix:/run/podman/podman.sock            # rootfull
 ```
 then from a pod running a docker/podman client, you will be able to access the daemon
 ```bash
