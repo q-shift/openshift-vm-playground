@@ -83,14 +83,8 @@ spec:
               user: fedora
               password: rhpass
               chpasswd: { expire: False }
-              packages:
-               - podman
-               - socat
-              cloud_init_per:
-                - |
-                  #!/bin/bash
-                  curl -o /usr/local/bin/config.sh https://raw.githubusercontent.com/iocanel/openshift-vm-playground/main/resources/config.sh
-                  /usr/local/bin/config.sh
+              runcmd:
+              - curl -sSL https://raw.githubusercontent.com/iocanel/openshift-vm-playground/main/resources/config.sh | bash
           name: cloudinitdisk
         - dataVolume:
             name: fedora38
