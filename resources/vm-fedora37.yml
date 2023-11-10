@@ -54,8 +54,7 @@ spec:
                 bus: virtio
               name: cloudinitdisk
           interfaces:
-            - macAddress: '02:38:72:00:00:09'
-              masquerade: {}
+            - masquerade: {}
               model: virtio
               name: default
           networkInterfaceMultiqueue: true
