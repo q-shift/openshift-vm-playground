@@ -60,7 +60,6 @@ timeout_seconds=300  # Set your desired timeout value
 start_time=$(date +%s)
 
 # Wait for the VirtualMachineInstance to be ready and in the desired state
-set -x
 while true; do
     # Get the VMI status in JSON format
     vmi_status=$(kubectl get vmi -n "$NAMESPACE" "$VM_NAME" -o json)
