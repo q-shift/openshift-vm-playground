@@ -52,8 +52,40 @@ kubectl apply -f pipelines/setup/configmap-maven-settings.yaml
 kubectl apply -f resources/vm-$VM_NAME.yml
 
 # Wait till socat is up and running
-# TODO: We should find a better way to track if socat is up and running
-while true; do virtctl -n $NAMESPACE ssh --known-hosts $HOME/.ssh/known_hosts --local-ssh fedora@$VM_NAME -c "sudo netstat -tulpn | grep \":$port.*socat\"" && break; sleep 30; done
+#VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
+#while true; do virtctl -n $NAMESPACE ssh --known-hosts $HOME/.ssh/known_hosts --local-ssh fedora@$VM_NAME -c "sudo netstat -tulpn | grep \":$port.*socat\"" && break; sleep 30; done
+
+# Get the VM_IP
+VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
+echo "IP of the VM - $VM_NAME: $VM_IP"
+
+# Run the pod
+kubectl run -n "$NAMESPACE" podname-client --image=quay.io/podman/stable -- "sleep" "1000000" &
+
+# Wait for the pod to be in the Running state
+while true; do
+    pod_status=$(kubectl get pod -n "$NAMESPACE" podname-client -ojsonpath='{.status.phase}')
+    if [ "$pod_status" == "Running" ]; then
+        break
+    fi
+    sleep 1
+done
+echo "Pod podname-client is in the Running state."
+
+echo "Wait for the command within the pod to succeed"
+echo ">>>> Command to be executed to check healthiness of podman & socat"
+echo ">>>> kubectl exec -n "$NAMESPACE" podname-client -- podman \"-r\" \"--url=tcp://$VM_IP:2376\" \"version\""
+while true; do
+    kubectl exec -n "$NAMESPACE" podname-client -- podman "-r" "--url=tcp://$VM_IP:2376" "version" &> /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Command within the pod succeeded."
+        break
+    else
+        echo "Remote podman is not yet ready to reply.."
+    fi
+    sleep 20
+done
+kubectl delete pod -n "$NAMESPACE" podname-client
 
 # Run the Tekton pipeline
 kubectl apply -f pipelines/tasks/git-clone.yaml
