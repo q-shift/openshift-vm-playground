@@ -2,14 +2,13 @@
 
 #
 # Command syntax
-#  ./e2e.sh test1 <VM_NAME> <NAMESPACE> <PUBLIC_KEY_FILE_PATH>
-#  Example: ./e2e.sh test1 fedora38 ~/.ssh/id_rsa.pub
-
-# Check if at least two arguments are provided
-if [ $# -lt 3 ]; then
-    echo "Usage: $0 <namespace> <vm_name> <public_key_file_path>"
-    exit 1
-fi
+#  ./e2e.sh test1 -v <VM_NAME> -n <NAMESPACE> -p <PUBLIC_KEY_FILE_PATH>
+#  Examples:
+#
+#   ./e2e.sh 
+#   ./e2e.sh -v fedora38
+#   ./e2e.sh -v fedora38 -p ~/.ssh/somekey_rsa.pub
+#   ./e2e.sh -n test1 -v fedora38 -p ~/.ssh/id_rsa.pub
 
 if command -v virtctl &> /dev/null; then
    :  # Command exists, do nothing (null command)
@@ -18,28 +17,55 @@ else
   exit 1
 fi
 
-NAMESPACE=$1
-VM_NAME=$2
-PUBLIC_KEY_FILE_PATH=$3
+NAMESPACE=""
+VM_NAME="fedora38"
+PUBLIC_KEY_FILE_PATH="${HOME}/.ssh/id_rsa.pub"
 
-# Continue with the rest of your script using $NAMESPACE and $VM_NAME
-echo "VM Name: $VM_NAME"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -n|--namespace)
+      NAMESPACE="$2"
+      shift
+      ;;
+    -v|--vm-name)
+      VM_NAME="$2"
+      shift
+      ;;
+    -p|--public-key-file)
+      PUBLIC_KEY_FILE_PATH="$2"
+      shift
+      ;;
+    -*)
+      echo "Error: Invalid option: $1"
+      usage
+      ;;
+    *)
+      break  # Break the loop when the first non-option argument is encountered
+      ;;
+  esac
+  shift
+done
 
-# Check if the namespace exists
-if kubectl get namespace "$NAMESPACE" &> /dev/null; then
-    echo "Namespace '$NAMESPACE' already exists."
+if [ -n "$NAMESPACE" ]; then
+  # Check if the namespace exists
+  if kubectl get namespace "$NAMESPACE" &> /dev/null; then
+      echo "Namespace '$NAMESPACE' already exists."
+  else
+      # Create the namespace
+      kubectl create namespace "$NAMESPACE"
+      echo "Namespace '$NAMESPACE' created."
+  fi
+
+  # Set the namespace as the current context
+  kubectl config set-context --current --namespace="$NAMESPACE"
 else
-    # Create the namespace
-    kubectl create namespace "$NAMESPACE"
-    echo "Namespace '$NAMESPACE' created."
+  NAMESPACE=$(kubectl config view --minify -o jsonpath='{.contexts[0].context.namespace}')
 fi
 
-# Set the namespace as the current context
-kubectl config set-context --current --namespace="$NAMESPACE"
-
-# Print the current context to verify
-echo "Current context:"
-kubectl config current-context
+# Continue with the rest of your script using $NAMESPACE and $VM_NAME
+echo "VM name: $VM_NAME"
+echo "Namespace: $NAMESPACE"
+echo "Public key file: $PUBLIC_KEY_FILE_PATH"
 
 # Create the secret hosting the public key
 kubectl create secret generic fedora-ssh-key --from-file=key=$PUBLIC_KEY_FILE_PATH
