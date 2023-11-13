@@ -62,7 +62,7 @@ tkn pr logs quarkus-maven-build-run -f
 
 **NOTE**: If you experiment an issue with the `podman -r run`, you can then modify the `create-remote-container` included within the pipeline `quarkus-maven-build` and set the parameter `debug` to `true` within the PipelineRun `quarkus-maven-build-run`
 
-## End to end test
+## End-to-end test
 
 To play with Kubevirt and Tekton and execute an end to end test case where we create a Virtual Machine running podman 
 and next deploy a Tekto pipeline able to build a Quarkus application running some Test container(s), execute this command:
@@ -71,7 +71,7 @@ and next deploy a Tekto pipeline able to build a Quarkus application running som
 ```
 where:
 - <VM_NAME>: name of the virtual machine and also OS image to download (e.g fedora38 = quay.io/containerdisks/fedora:38)
-- <NAMESPACE>: kubenetes namespace where scenario should be deployed and tested
+- <NAMESPACE>: kubernetes namespace where scenario should be deployed and tested
 - <PUBLIC_KEY_FILE_PATH>: path to the file containing the public key to be imported within the VM
 
 ## Access podman remotely

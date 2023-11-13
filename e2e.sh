@@ -46,6 +46,16 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+# Function to format elapsed time
+format_elapsed_time() {
+    local elapsed_time=$1
+    local minutes=$((elapsed_time / 60))
+    local seconds=$((elapsed_time % 60))
+
+    # Format the elapsed time
+    printf "%02dm:%02ds\n" "$minutes" "$seconds"
+}
+
 if [ -n "$NAMESPACE" ]; then
   # Check if the namespace exists
   if kubectl get namespace "$NAMESPACE" &> /dev/null; then
@@ -73,6 +83,9 @@ kubectl create secret generic fedora-ssh-key --from-file=key=$PUBLIC_KEY_FILE_PA
 # Create the PVC used by Tekton and configMap
 kubectl apply -f pipelines/setup/persistentvolumeclaim-project-pvc.yaml
 kubectl apply -f pipelines/setup/configmap-maven-settings.yaml
+
+# Measuring start time before to create a VM
+start_time=$(date +%s)
 
 # Deploying a VM
 kubectl apply -f resources/vm-$VM_NAME.yml
@@ -146,6 +159,14 @@ while true; do
     sleep 20
 done
 kubectl delete pod -n "$NAMESPACE" podname-client
+
+# Record end time
+end_time=$(date +%s)
+
+# Calculate elapsed time
+elapsed_time=$((end_time - start_time))
+formatted_elapsed_time=$(format_elapsed_time "$elapsed_time")
+echo "Creating a VM and provisioning it took: $formatted_elapsed_time"
 
 # Run the Tekton pipeline
 kubectl apply -f pipelines/tasks/git-clone.yaml
