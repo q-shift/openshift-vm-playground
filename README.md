@@ -2,13 +2,13 @@
 
 ## Prerequisites
 
-- [virtctl](https://docs.openshift.com/container-platform/4.13/virt/virt-using-the-cli-tools.html#installing-virtctl_virt-using-the-cli-tools) client
+- [virtctl](https://docs.openshift.com/container-platform/4.13/virt/virt-using-the-cli-tools.html#installing-virtctl_virt-using-the-cli-tools) client (optional)
 - [Tekton client](https://tekton.dev/docs/cli/)
 
 ## Instructions to create a VM and to ssh to it
 
-- Log on to an OCP 4.13 cluster, install the Openshift virtualization operator 
-- Deploy the `HyperConverged` CR to enable the nested virtualization feature:
+- Log on to an OCP >=4.13 cluster, install the Openshift virtualization operator 
+- Deploy the `HyperConverged` CR to enable the nested virtualization features:
 ```bash
 kubectl apply -f resources/hyperconverged.yml
 ```
@@ -25,10 +25,20 @@ kubectl create secret generic fedora-ssh-key -n <NAMESPACE> --from-file=key=~/.s
 kubectl delete -n <NAMESPACE> vm/fedora38
 kubectl apply -n <NAMESPACE> -f resources/vm-fedora38.yml
 ```
-- When the VM is running, you can ssh using the following command (optional)
+- If a loadblancer is available on the platform where the cluster is running, then deploy a Service of type `Loabalancer` to access it using a ssh client
+```bash
+kubectl apply -f resources/service.yml
+...
+# Wait till you got an external IP address
+VM_IP=$(kubectl get svc/fedora38-loadbalancer-ssh-service -ojson | jq -r '.status.loadBalancer.ingress[].ip')
+ssh -p 22000 fedora@$VM_IP
+```
+
+**NOTE**: If you have installed the virtctl client, you can also ssh to the vm using the following command able to forward the traffic:
 ```bash
 virtctl ssh --local-ssh fedora@fedora38
 ```
+
 ## Build a Quarkus application using Tekton
 
 First create the pvc used to git clone and build quarkus
