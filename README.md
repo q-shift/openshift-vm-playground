@@ -74,8 +74,14 @@ tkn pr logs quarkus-maven-build-run -f
 
 ## End-to-end test
 
-To play with Kubevirt and Tekton and execute an end to end test case where we create a Virtual Machine running podman 
-and next deploy a Tekto pipeline able to build a Quarkus application running some Test container(s), execute this command:
+To play with Kubevirt & Tekton to execute an end to end test case where we:
+- Create a Virtual Machine 
+- Provision it to install podman, socat
+- Expose the podman daemon using socat
+- Deploy a Tekton pipeline on the cluster and launch it to git clone a Quarkus application and build it
+- Consult the log of the pipeline to verify if the maven succeeds as it use a testcontainer (e.g postgresql) and access remotely podman
+
+execute this command:
 ```bash
 ./e2e.sh <VM_NAME> <NAMESPACE> <PUBLIC_KEY_FILE_PATH>
 ```
