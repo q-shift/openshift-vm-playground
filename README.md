@@ -83,7 +83,7 @@ To play with Kubevirt & Tekton to execute an end to end test case where we:
 
 execute this command:
 ```bash
-./e2e.sh <VM_NAME> <NAMESPACE> <PUBLIC_KEY_FILE_PATH>
+./e2e.sh -v <VM_NAME> -n <NAMESPACE> -p <PUBLIC_KEY_FILE_PATH>
 ```
 where:
 - <VM_NAME>: name of the virtual machine and also OS image to download (e.g fedora38 = quay.io/containerdisks/fedora:38)
