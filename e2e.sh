@@ -177,13 +177,34 @@ formatted_elapsed_time=$(format_elapsed_time "$elapsed_time")
 echo "Creating a VM and provisioning it took: $formatted_elapsed_time"
 
 # Run the Tekton pipeline
+
+#
+# Setup tasks for the Pipeline
+#
+
+# Let's delete before applying to avoid issues with immutable fields
+kubectl delete -f pipelines/tasks/git-clone.yaml 2> /dev/null
 kubectl apply -f pipelines/tasks/git-clone.yaml
+
+kubectl delete -f pipelines/tasks/rm-workspace.yaml 2> /dev/null
 kubectl apply -f pipelines/tasks/rm-workspace.yaml
+
+kubectl delete -f pipelines/tasks/ls-workspace.yaml 2> /dev/null
 kubectl apply -f pipelines/tasks/ls-workspace.yaml
+
+kubectl delete -f pipelines/tasks/maven.yaml 2> /dev/null
 kubectl apply -f pipelines/tasks/maven.yaml
+
+kubectl delete -f pipelines/tasks/virtualmachine.yaml 2> /dev/null
 kubectl apply -f pipelines/tasks/virtualmachine.yaml
+
+kubectl delete -f pipelines/pipelines/quarkus-maven-build.yaml 2> /dev/null
 kubectl apply -f pipelines/pipelines/quarkus-maven-build.yaml
+
+#
+# Run the Pipeline
+#
+kubectl delete -f pipelines/pipelineruns/quarkus-maven-build-run.yaml 2> /dev/null
 kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-run.yaml
 
 tkn pr logs quarkus-maven-build-run -f
-
