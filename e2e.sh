@@ -20,6 +20,7 @@ fi
 NAMESPACE=""
 VM_NAME="fedora38"
 PUBLIC_KEY_FILE_PATH="${HOME}/.ssh/id_rsa.pub"
+REUSE_VM=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -34,6 +35,9 @@ while [ $# -gt 0 ]; do
     -p|--public-key-file)
       PUBLIC_KEY_FILE_PATH="$2"
       shift
+      ;;
+    -r|--reuse-vm)
+      REUSE_VM="true"
       ;;
     -*)
       echo "Error: Invalid option: $1"
@@ -72,62 +76,65 @@ else
   NAMESPACE=$(kubectl config view --minify -o jsonpath='{.contexts[0].context.namespace}')
 fi
 
+<<<<<<< HEAD
 # Continue with the rest of your script using $NAMESPACE and $VM_NAME
-echo "VM name: $VM_NAME"
-echo "Namespace: $NAMESPACE"
-echo "Public key file: $PUBLIC_KEY_FILE_PATH"
-
-# Create the secret hosting the public key
-kubectl create secret generic fedora-ssh-key --from-file=key=$PUBLIC_KEY_FILE_PATH
-
-# Create the PVCs needed by Tekton (project, m2) and ConfigMap containing the maven settings
-kubectl apply -f pipelines/setup/project-pvc.yaml
-kubectl apply -f pipelines/setup/m2-repo-pvc.yaml
-kubectl apply -f pipelines/setup/configmap-maven-settings.yaml
-
-# Measuring start time before to create a VM
-start_time=$(date +%s)
-
-# Deploying a VM
-kubectl apply -f resources/vm-$VM_NAME.yml
-
-# Wait till socat is up and running
-#VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
-#while true; do virtctl -n $NAMESPACE ssh --known-hosts $HOME/.ssh/known_hosts --local-ssh fedora@$VM_NAME -c "sudo netstat -tulpn | grep \":$port.*socat\"" && break; sleep 30; done
-
-desired_state="Running"
-timeout_seconds=300  # Set your desired timeout value
-start_time=$(date +%s)
-
-# Wait for the VirtualMachineInstance to be ready and in the desired state
-while true; do
-    # Get the VMI status in JSON format
-    vmi_status=$(kubectl get vmi -n "$NAMESPACE" "$VM_NAME" -o json)
-
-    # Check if VMI exists
-    if [ -n "$vmi_status" ]; then
-        # Check if the VMI is in the desired state
-        vmi_phase=$(echo "$vmi_status" | jq -r '.status.phase')
-        if [ "$vmi_phase" == "$desired_state" ]; then
-            echo "VMI $VM_NAME is now in the '$desired_state' state."
-            break
-        else
-            echo "VMI $VM_NAME is in the '$vmi_phase' state. Waiting..."
-        fi
-    else
-        echo "VMI $VM_NAME does not exist. Waiting..."
-    fi
-
-    # Check if the timeout has been reached
-    current_time=$(date +%s)
-    elapsed_time=$((current_time - start_time))
-    if [ "$elapsed_time" -ge "$timeout_seconds" ]; then
-        echo "Timeout reached. Exiting."
-        break
-    fi
-
-    sleep 10  # Adjust the sleep interval as needed
-done
+if [ -z "$REUSE_VM" ]; then
+  echo "VM name: $VM_NAME"
+  echo "Namespace: $NAMESPACE"
+  echo "Public key file: $PUBLIC_KEY_FILE_PATH"
+  
+  # Create the secret hosting the public key
+  kubectl create secret generic fedora-ssh-key --from-file=key=$PUBLIC_KEY_FILE_PATH
+  
+  # Create the PVCs needed by Tekton (project, m2) and ConfigMap containing the maven settings
+  kubectl apply -f pipelines/setup/project-pvc.yaml
+  kubectl apply -f pipelines/setup/m2-repo-pvc.yaml
+  kubectl apply -f pipelines/setup/configmap-maven-settings.yaml
+  
+  # Measuring start time before to create a VM
+  start_time=$(date +%s)
+  
+  # Deploying a VM
+  kubectl apply -f resources/vm-$VM_NAME.yml
+  
+  # Wait till socat is up and running
+  #VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
+  #while true; do virtctl -n $NAMESPACE ssh --known-hosts $HOME/.ssh/known_hosts --local-ssh fedora@$VM_NAME -c "sudo netstat -tulpn | grep \":$port.*socat\"" && break; sleep 30; done
+  
+  desired_state="Running"
+  timeout_seconds=300  # Set your desired timeout value
+  start_time=$(date +%s)
+  
+  # Wait for the VirtualMachineInstance to be ready and in the desired state
+  while true; do
+      # Get the VMI status in JSON format
+      vmi_status=$(kubectl get vmi -n "$NAMESPACE" "$VM_NAME" -o json)
+  
+      # Check if VMI exists
+      if [ -n "$vmi_status" ]; then
+          # Check if the VMI is in the desired state
+          vmi_phase=$(echo "$vmi_status" | jq -r '.status.phase')
+          if [ "$vmi_phase" == "$desired_state" ]; then
+              echo "VMI $VM_NAME is now in the '$desired_state' state."
+              break
+          else
+              echo "VMI $VM_NAME is in the '$vmi_phase' state. Waiting..."
+          fi
+      else
+          echo "VMI $VM_NAME does not exist. Waiting..."
+      fi
+  
+      # Check if the timeout has been reached
+      current_time=$(date +%s)
+      elapsed_time=$((current_time - start_time))
+      if [ "$elapsed_time" -ge "$timeout_seconds" ]; then
+          echo "Timeout reached. Exiting."
+          break
+      fi
+  
+      sleep 10  # Adjust the sleep interval as needed
+  done
+fi
 
 # Get the VM_IP
 VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
