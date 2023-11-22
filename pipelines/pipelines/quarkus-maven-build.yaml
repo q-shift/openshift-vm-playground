@@ -84,7 +84,7 @@ spec:
               # $PODMAN_CMD kill $CONTAINER_ID
               # $PODMAN_CMD rm $CONTAINER_ID
 
-    - name: maven
+    - name: maven-build
       runAfter:
         - virtualmachine
       taskRef:
@@ -97,5 +97,22 @@ spec:
           workspace: maven-settings
         - name: project-dir
           workspace: project-dir
-        - name: maven-m2-repo
-          workspace: maven-m2-repo
+    - name: maven-deploy
+      runAfter:
+        - maven-build
+      taskRef:
+        name: maven
+      params:
+        - name: DOCKER_HOST
+          value: "tcp://$(tasks.virtualmachine.results.ip):2376"
+        - name: GOALS
+          value:
+            - quarkus:deploy
+            - -Dquarkus.openshift.deploy=true
+            - -Dquarkus.log.level=DEBUG
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: project-dir
+          workspace: project-dir
+
