@@ -1,0 +1,104 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora38
+  labels:
+    app: fedora38
+    vm.kubevirt.io/template: fedora-server-small
+    vm.kubevirt.io/template.namespace: openshift
+    vm.kubevirt.io/template.revision: '1'
+    vm.kubevirt.io/template.version: v0.25.0
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: fedora38
+      spec:
+        source:
+          registry:
+            url: 'docker://quay.io/containerdisks/fedora:38'
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  running: true
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: fedora
+        vm.kubevirt.io/workload: server
+      labels:
+        kubevirt.io/domain: fedora38
+        kubevirt.io/size: small
+    spec:
+      accessCredentials:
+        - sshPublicKey:
+            propagationMethod:
+              configDrive: {}
+            source:
+              secret:
+                secretName: fedora-ssh-key
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            #- masquerade: {}
+            #  model: virtio
+            #  name: default
+            - bridge: {}
+              macAddress: '02:e8:5c:00:00:07'
+              model: virtio
+              name: nic-healthy-catfish
+          networkInterfaceMultiqueue: true
+          rng: {}
+        features:
+          acpi: {}
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            efi: {}
+        machine:
+          type: pc-q35-rhel9.2.0
+        resources:
+          requests:
+            memory: 2Gi
+      evictionStrategy: LiveMigrate
+      networks:
+        #- name: default
+        #  pod: {}
+        - multus:
+            networkName: localnet1
+          name: nic-healthy-catfish
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - cloudInitConfigDrive:
+            networkData: |
+              version: 2
+              ethernets:
+                eth0:
+                  addresses: 
+                  - 172.208.5.5/24
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: rhpass
+              chpasswd: { expire: False }
+              runcmd:
+              - curl -sSL https://raw.githubusercontent.com/iocanel/openshift-vm-playground/main/resources/config.sh | bash
+          name: cloudinitdisk
+        - dataVolume:
+            name: fedora38
+          name: rootdisk
