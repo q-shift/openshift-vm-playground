@@ -1,0 +1,24 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br1-policy
+spec:
+  nodeSelector:
+    #kubernetes.io/hostname: ocp-sdev-p75fs-worker-0-4tp92
+    kubernetes.io/hostname: worker-0.quarkusocp.lab.upshift.rdu2.redhat.com
+  #  node-role.kubernetes.io/worker: ""
+  desiredState:
+    interfaces:
+      - name: br1
+        description: Linux bridge with ens3 as a port
+        type: linux-bridge
+        state: up
+        #ipv4:
+        # dhcp: true
+        # enabled: true
+        bridge:
+          options:
+            stp:
+              enabled: false
+          #port:
+          #  - name: ens3

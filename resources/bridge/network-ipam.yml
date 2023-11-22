@@ -1,0 +1,21 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: worker-lan
+spec:
+  config: '{
+      "name":"worker-lan",
+      "cniVersion": "0.3.1",
+      "type": "cnv-bridge",
+      "bridge": "worker-lan",
+      "ipam": {
+        "type": "host-local",
+        "subnet": "172.208.0.0/16",
+        "rangeStart": "172.208.0.100",
+        "rangeEnd": "172.208.0.100",
+        "routes": [
+          {"dst": "172.208.0.0/16"}
+        ],
+        "gateway": "172.208.0.1"
+      }
+    }'
