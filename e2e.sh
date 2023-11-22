@@ -80,8 +80,9 @@ echo "Public key file: $PUBLIC_KEY_FILE_PATH"
 # Create the secret hosting the public key
 kubectl create secret generic fedora-ssh-key --from-file=key=$PUBLIC_KEY_FILE_PATH
 
-# Create the PVC used by Tekton and configMap
-kubectl apply -f pipelines/setup/persistentvolumeclaim-project-pvc.yaml
+# Create the PVCs needed by Tekton (project, m2) and ConfigMap containing the maven settings
+kubectl apply -f pipelines/setup/project-pvc.yaml
+kubectl apply -f pipelines/setup/m2-repo-pvc.yaml
 kubectl apply -f pipelines/setup/configmap-maven-settings.yaml
 
 # Measuring start time before to create a VM

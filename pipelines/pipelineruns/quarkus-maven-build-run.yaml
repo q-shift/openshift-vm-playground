@@ -16,6 +16,9 @@ spec:
     - name: project-dir
       persistentVolumeClaim:
         claimName: project-pvc
+    - name: maven-m2-repo
+      persistentVolumeClaim:
+        claimName: m2-repo-pvc
     - name: maven-settings
       configMap:
         name: maven-settings

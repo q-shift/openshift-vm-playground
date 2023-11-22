@@ -44,7 +44,9 @@ virtctl ssh --local-ssh fedora@fedora38
 First create the pvc used to git clone and build quarkus
 ```bash
 cd pipelines 
-kubectl apply -f setup/persistentvolumeclaim-project-pvc.yaml
+kubectl apply -f setup/project-pvc.yaml
+kubectl apply -f setup/m2-repo-pvc.yaml
+kubectl apply -f setup/configmap-maven-settings.yaml
 ```
 
 Next, deploy the pipeline and pipelineRun to build the Quarkus application
@@ -57,8 +59,8 @@ kubectl delete task/rm-workspace
 kubectl delete task/virtualmachine
 kubectl delete task/ls-workspace
 
-kubectl apply -f tasks/git-clone.yaml
 kubectl apply -f tasks/rm-workspace.yaml
+kubectl apply -f tasks/git-clone.yaml
 kubectl apply -f tasks/ls-workspace.yaml
 kubectl apply -f tasks/maven.yaml
 kubectl apply -f tasks/virtualmachine.yaml
@@ -71,6 +73,17 @@ tkn pr logs quarkus-maven-build-run -f
 ```
 
 **NOTE**: If you experiment an issue with the `podman -r run`, you can then modify the `create-remote-container` included within the pipeline `quarkus-maven-build` and set the parameter `debug` to `true` within the PipelineRun `quarkus-maven-build-run`
+
+### Replay the pipeline
+
+To replay the Pipeline, it is needed to delete first the git cloned project and its pvc otherwise the step will report this error: `[git-clone : clone] fatal: destination path '.' already exists and is not an empty directory.`
+```bash
+kubectl delete -f pipelineruns/quarkus-maven-build-run.yaml
+kubectl delete -f setup/project-pvc.yaml
+kubectl apply -f setup/project-pvc.yaml
+kubectl apply -f pipelineruns/quarkus-maven-build-run.yaml
+tkn pr logs quarkus-maven-build-run -f
+```
 
 ## End-to-end test
 
