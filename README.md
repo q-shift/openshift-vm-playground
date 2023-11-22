@@ -25,7 +25,7 @@ kubectl create secret generic fedora-ssh-key -n <NAMESPACE> --from-file=key=~/.s
 kubectl delete -n <NAMESPACE> vm/fedora38
 kubectl apply -n <NAMESPACE> -f resources/vm-fedora38.yml
 ```
-- If a loadblancer is available on the platform where the cluster is running, then deploy a Service of type `Loabalancer` to access it using a ssh client
+- If a loadbalancer is available on the platform where the cluster is running, then deploy a Service of type `Loabalancer` to access it using a ssh client
 ```bash
 kubectl apply -f resources/service.yml
 ...
