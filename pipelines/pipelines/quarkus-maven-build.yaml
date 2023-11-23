@@ -92,6 +92,12 @@ spec:
       params:
         - name: DOCKER_HOST
           value: "tcp://$(tasks.virtualmachine.results.ip):2376"
+        - name: GOALS
+          value:
+          - package
+          - -Dquarkus.openshift.build-strategy=docker
+          - -Dquarkus.container-image.build=true
+          - -Dquarkus.container-image.push=true
       workspaces:
         - name: maven-settings
           workspace: maven-settings
