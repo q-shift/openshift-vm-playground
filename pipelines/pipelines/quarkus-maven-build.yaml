@@ -16,6 +16,7 @@ spec:
       type: string
   workspaces:
     - name: project-dir
+    - name: maven-m2-repo
     - name: maven-settings
   tasks:
     - name: rm-workspace
@@ -96,3 +97,5 @@ spec:
           workspace: maven-settings
         - name: project-dir
           workspace: project-dir
+        - name: maven-m2-repo
+          workspace: maven-m2-repo
