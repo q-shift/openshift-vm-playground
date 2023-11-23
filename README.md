@@ -4,10 +4,12 @@
 
 - [virtctl](https://docs.openshift.com/container-platform/4.13/virt/virt-using-the-cli-tools.html#installing-virtctl_virt-using-the-cli-tools) client (optional)
 - [Tekton client](https://tekton.dev/docs/cli/)
+- ocp cluster >= 4.13
+- Tekton & Kubevirt operators installed
 
 ## Instructions to create a VM and to ssh to it
 
-- Log on to an OCP >=4.13 cluster, install the Openshift virtualization operator 
+- Log on to your OCP cluster
 - Deploy the `HyperConverged` CR to enable the nested virtualization features:
 ```bash
 kubectl apply -f resources/hyperconverged.yml
