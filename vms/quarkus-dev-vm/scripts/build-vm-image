@@ -7,6 +7,5 @@ virt-builder fedora-38 \
   --root-password password:fedora \
   --install cloud-init,podman,socat \
   --run /root/scripts/customize-vm \
-  #--firstboot /root/scripts/first-boot \
   --output /output/quarkus-dev-vm.qcow2 \
   -v
