@@ -76,7 +76,6 @@ else
   NAMESPACE=$(kubectl config view --minify -o jsonpath='{.contexts[0].context.namespace}')
 fi
 
-<<<<<<< HEAD
 # Continue with the rest of your script using $NAMESPACE and $VM_NAME
 if [ -z "$REUSE_VM" ]; then
   echo "VM name: $VM_NAME"
