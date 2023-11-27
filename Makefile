@@ -2,8 +2,8 @@ REG ?= quay.io
 ORG ?= ch007m
 VM_IMAGE_BUILDER_IMAGE_NAME := virt-builder
 VM_IMAGE_BUILDER_IMAGE_TAG ?= latest
-VIRT_BUILDER_CACHE_DIR := $(HOME)/_virt_builder/cache
-VIRT_BUILDER_OUTPUT_DIR := $(HOME)/_virt_builder/output
+VIRT_BUILDER_CACHE_DIR := $(CURDIR)/_virt_builder/cache
+VIRT_BUILDER_OUTPUT_DIR := $(CURDIR)/_virt_builder/output
 VM_CONTAINER_DISK_IMAGE_NAME := quarkus-dev-vm
 VM_CONTAINER_DISK_IMAGE_TAG ?= latest
 CURRENT_DIR := $(shell pwd)
@@ -24,7 +24,7 @@ build-vm-image: build-vm-image-builder
       /root/scripts/build-vm-image
 .PHONY: build-vm-image
 
-build-vm-container-disk: build-vm-image
+build-vm-container-disk:
 	docker build $(CURDIR) -f $(CURDIR)/vms/quarkus-dev-vm/Dockerfile -t $(REG)/$(ORG)/$(VM_CONTAINER_DISK_IMAGE_NAME):$(VM_CONTAINER_DISK_IMAGE_TAG)
 .PHONY: build-vm-container-disk
 
