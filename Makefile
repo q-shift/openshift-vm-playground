@@ -6,6 +6,7 @@ VIRT_BUILDER_CACHE_DIR := $(HOME)/_virt_builder/cache
 VIRT_BUILDER_OUTPUT_DIR := $(HOME)/_virt_builder/output
 VM_CONTAINER_DISK_IMAGE_NAME := quarkus-dev-vm
 VM_CONTAINER_DISK_IMAGE_TAG ?= latest
+CURRENT_DIR := $(shell pwd)
 
 build-vm-image-builder:
 	docker build $(CURDIR)/vms/image-builder -f $(CURDIR)/vms/image-builder/Dockerfile -t $(REG)/$(ORG)/$(VM_IMAGE_BUILDER_IMAGE_NAME):$(VM_IMAGE_BUILDER_IMAGE_TAG)
