@@ -20,7 +20,7 @@ build-vm-image: build-vm-image-builder
       --volume=$(VIRT_BUILDER_OUTPUT_DIR):/output:Z \
       --volume=$(CURDIR)/vms/quarkus-dev-vm/scripts:/root/scripts:Z \
       $(REG)/$(ORG)/$(VM_IMAGE_BUILDER_IMAGE_NAME):$(VM_IMAGE_BUILDER_IMAGE_TAG) \
-      /root/scripts/quarkus-dev-vm
+      /root/scripts/build-vm-image
 .PHONY: build-vm-image
 
 build-vm-container-disk: build-vm-image
