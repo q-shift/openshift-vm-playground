@@ -3,18 +3,11 @@ kind: Task
 metadata:
   annotations:
     customizeCommands.params.task.kubevirt.io/type: script
-    operator-sdk/primary-resource: openshift-cnv/ssp-kubevirt-hyperconverged
-    operator-sdk/primary-resource-type: SSP.ssp.kubevirt.io
     pvc.params.task.kubevirt.io/apiVersion: v1
     pvc.params.task.kubevirt.io/kind: PersistentVolumeClaim
     verbose.params.task.kubevirt.io/type: boolean
   name: disk-virt-customize
   labels:
-    app.kubernetes.io/component: tektonTasks
-    app.kubernetes.io/managed-by: ssp-operator
-    app.kubernetes.io/name: tekton-tasks
-    app.kubernetes.io/part-of: hyperconverged-cluster
-    app.kubernetes.io/version: 4.14.0
     task.kubevirt.io/category: disk-virt-customize
     task.kubevirt.io/type: disk-virt-customize
     tekton-tasks.kubevirt.io/version: v0.15.0
