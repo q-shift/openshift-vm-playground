@@ -24,7 +24,7 @@ build-vm-image: build-vm-image-builder
       /root/scripts/build-vm-image
 .PHONY: build-vm-image
 
-build-vm-container-disk: build-vm-image
+build-vm-container-disk:
 	docker build $(CURDIR) -f $(CURDIR)/vms/quarkus-dev-vm/Dockerfile -t $(REG)/$(ORG)/$(VM_CONTAINER_DISK_IMAGE_NAME):$(VM_CONTAINER_DISK_IMAGE_TAG)
 .PHONY: build-vm-container-disk
 
