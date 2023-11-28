@@ -6,8 +6,8 @@ Useful link: https://cloud.redhat.com/blog/building-vm-images-using-tekton-and-s
 #kubectl delete -f vms/virt-custom/dv-fedora39-cloud-base.yml
 #kubectl apply -f vms/virt-custom/dv-fedora39-cloud-base.yml
 
-kubectl delete -f vms/virt-custom/dv-containerdisks-fedora.yml
-kubectl apply -f  vms/virt-custom/dv-containerdisks-fedora.yml
+kubectl delete -f vms/virt-custom/dv-containerdisks-fedora38.yml
+kubectl apply -f  vms/virt-custom/dv-containerdisks-fedora38.yml
 
 kubectl delete -f vms/virt-custom/secret.yml
 kubectl apply -f vms/virt-custom/secret.yml
