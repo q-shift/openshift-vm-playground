@@ -3,23 +3,13 @@ kind: DataVolume
 metadata:
   annotations:
     cdi.kubevirt.io/storage.bind.immediate.requested: "true"
-    cdi.kubevirt.io/storage.usePopulator: "true"
-  labels:
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/managed-by: cdi-controller
-    app.kubernetes.io/part-of: hyperconverged-cluster
-    app.kubernetes.io/version: 4.14.0
-    cdi.kubevirt.io/dataImportCron: fedora-image-cron
-    instancetype.kubevirt.io/default-instancetype: u1.medium
-    instancetype.kubevirt.io/default-preference: fedora
-    kubevirt.io/dynamic-credentials-support: "true"
   name: fedora-39
 spec:
   source:
     registry:
-      pullMethod: node
       url: docker://quay.io/containerdisks/fedora:39
   storage:
     resources:
       requests:
         storage: 30Gi
+    volumeMode: Filesystem
