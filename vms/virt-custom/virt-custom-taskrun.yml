@@ -1,0 +1,29 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: disk-virt-customize-taskrun-01
+spec:
+  taskRef:
+    kind: Task
+    name: disk-virt-customize
+  params:
+    - name: pvc
+      value: fedora-cloud-39-base
+    - name: customizeCommands
+      value: |
+        root-password file:/data01/password
+        run-command useradd -m fedora
+        mkdir /home/fedora/.ssh
+        chmod 0700:/home/fedora/.ssh
+        upload /data01/authorized_keys:/home/fedora/.ssh/
+        chmod 0600:/home/fedora/.ssh/authorized_keys
+        install podman, socat
+  workspaces:
+    - name: data01
+      projected:
+        sources:
+          - secret:
+              name: disk-virt-customize-workspace-secret-01
+          -  secret:
+               name: disk-virt-customize-workspace-secret-02
+---

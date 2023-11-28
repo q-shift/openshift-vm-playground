@@ -1,0 +1,138 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  annotations:
+    customizeCommands.params.task.kubevirt.io/type: script
+    operator-sdk/primary-resource: openshift-cnv/ssp-kubevirt-hyperconverged
+    operator-sdk/primary-resource-type: SSP.ssp.kubevirt.io
+    pvc.params.task.kubevirt.io/apiVersion: v1
+    pvc.params.task.kubevirt.io/kind: PersistentVolumeClaim
+    verbose.params.task.kubevirt.io/type: boolean
+  name: disk-virt-customize
+  labels:
+    app.kubernetes.io/component: tektonTasks
+    app.kubernetes.io/managed-by: ssp-operator
+    app.kubernetes.io/name: tekton-tasks
+    app.kubernetes.io/part-of: hyperconverged-cluster
+    app.kubernetes.io/version: 4.14.0
+    task.kubevirt.io/category: disk-virt-customize
+    task.kubevirt.io/type: disk-virt-customize
+    tekton-tasks.kubevirt.io/version: v0.15.0
+spec:
+  params:
+    - description: >-
+        PersistentVolumeClaim to run the the virt-customize script in. PVC
+        should be in the same namespace as taskrun/pipelinerun.
+      name: pvc
+      type: string
+    - default: ''
+      description: virt-customize commands in "--commands-from-file" format.
+      name: customizeCommands
+      type: string
+    - default: 'false'
+      description: Enable verbose mode and tracing of libguestfs API calls.
+      name: verbose
+      type: string
+    - default: ''
+      description: Additional options to pass to virt-customize.
+      name: additionalOptions
+      type: string
+  steps:
+    - args:
+        - '--verbose'
+        - $(params.verbose)
+      command:
+        - entrypoint
+      computeResources:
+        limits:
+          devices.kubevirt.io/kvm: '1'
+          devices.kubevirt.io/tun: '1'
+          devices.kubevirt.io/vhost-net: '1'
+        requests:
+          devices.kubevirt.io/kvm: '1'
+          devices.kubevirt.io/tun: '1'
+          devices.kubevirt.io/vhost-net: '1'
+      env:
+        - name: COMMAND
+          value: disk-virt-customize
+        - name: CUSTOMIZE_COMMANDS
+          value: $(params.customizeCommands)
+        - name: ADDITIONAL_VIRT_CUSTOMIZE_OPTIONS
+          value: $(params.additionalOptions)
+        - name: LIBGUESTFS_BACKEND
+          value: direct
+      image: >-
+        registry.redhat.io/container-native-virtualization/kubevirt-tekton-tasks-disk-virt-customize-rhel9@sha256:13b34c7730a63a96ec6c3154c4da78e7ff7a6100f4afe916ba9b58ad49349e42
+      name: run-virt-customize
+      volumeMounts:
+        - mountPath: /mnt/appliance/
+          name: guestfsappliance
+        - mountPath: /mnt/targetpvc/
+          name: targetpvc
+  volumes:
+    - emptyDir: {}
+      name: guestfsappliance
+    - name: targetpvc
+      persistentVolumeClaim:
+        claimName: $(params.pvc)
+  workspaces:
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data01
+      name: data01
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data02
+      name: data02
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data03
+      name: data03
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data04
+      name: data04
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data05
+      name: data05
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data06
+      name: data06
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data07
+      name: data07
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data08
+      name: data08
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data09
+      name: data09
+      optional: true
+    - description: |
+        An optional workspace that may contain files or secrets to be
+        used during the virt-customize run.
+      mountPath: /data10
+      name: data10
+      optional: true
