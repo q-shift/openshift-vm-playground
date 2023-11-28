@@ -2,10 +2,11 @@
 
 export LIBGUESTFS_BACKEND=direct
 
-virt-builder fedora-38 \
+virt-builder fedora-39 \
   --format qcow2 \
   --root-password password:fedora \
   --install cloud-init,podman,socat \
   --run /root/scripts/customize-vm \
   --output /output/quarkus-dev-vm.qcow2 \
+  --selinux-relabel \
   -v
