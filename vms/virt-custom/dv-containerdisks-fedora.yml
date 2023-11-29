@@ -3,13 +3,13 @@ kind: DataVolume
 metadata:
   annotations:
     cdi.kubevirt.io/storage.bind.immediate.requested: "true"
-  name: fedora-39
+  name: fedora-latest
 spec:
   source:
     registry:
-      url: docker://quay.io/containerdisks/fedora:39
+      url: docker://quay.io/ch007m/quarkus-dev-vm #docker://quay.io/containerdisks/fedora
   storage:
     resources:
       requests:
-        storage: 30Gi
+        storage: 10Gi
     volumeMode: Filesystem
