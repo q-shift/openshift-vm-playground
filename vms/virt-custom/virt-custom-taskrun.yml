@@ -8,7 +8,7 @@ spec:
     name: disk-virt-customize
   params:
     - name: pvc
-      value: fedora-38
+      value: fedora-latest
     - name: customizeCommands
       value: |
         root-password file:/data01/password
