@@ -1,10 +1,8 @@
 #!/bin/bash
 
 sudo dnf -y install podman socat
-#systemctl --user enable --now podman.socket
-#loginctl enable-linger 1000
-sudo systemctl start podman.socket # systemctl enable podman.socket
-sudo systemctl enable podman.socket # systemctl start podman.socket
+sudo systemctl start podman.socket
+sudo systemctl enable podman.socket
 
 sudo modprobe iptable-nat
 sudo cat > /etc/systemd/system/podman-remote.service <<EOF
