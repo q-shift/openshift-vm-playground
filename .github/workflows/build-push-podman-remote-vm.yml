@@ -6,7 +6,6 @@ on:
 env:
   LIBGUESTFS_BACKEND: direct
   OS_IMAGE: https://fedora.mirrorservice.org/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-38-1.6.x86_64.qcow2
-  QUAY_ORG: snowdrop
 
 jobs:
   build-push:
@@ -47,6 +46,8 @@ jobs:
 
       - name: Push To quay.io
         id: push-to-quay
+        env:
+          QUAY_ORG: snowdrop
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-image.outputs.image }}
