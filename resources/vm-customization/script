@@ -1,10 +1,12 @@
-#!/bin/bash
+sudo useradd -m fedora -s /bin/bash
+sudo echo "fedora ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/fedora
+sudo echo fedora | passwd fedora --stdin
+sudo sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+sudo dnf clean all -y
 
-sudo dnf -y install podman socat
 sudo systemctl start podman.socket
 sudo systemctl enable podman.socket
 
-sudo modprobe iptable-nat
 sudo cat > /etc/systemd/system/podman-remote.service <<EOF
 [Unit]
 Description=Podman Remote

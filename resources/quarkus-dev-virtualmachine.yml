@@ -1,36 +1,31 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: fedora38
+  name: quarkus-dev
   labels:
-    app: fedora38
-    vm.kubevirt.io/template: fedora-server-small
-    vm.kubevirt.io/template.namespace: openshift
-    vm.kubevirt.io/template.revision: '1'
-    vm.kubevirt.io/template.version: v0.25.0
+    app: quarkus-dev
 spec:
   dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
       metadata:
-        name: fedora38
+        name: quarkus-dev-disk
       spec:
-        source:
-          registry:
-            url: 'docker://quay.io/containerdisks/fedora:38'
-        storage:
+        pvc:
+          accessModes:
+            - ReadWriteOnce
           resources:
             requests:
-              storage: 30Gi
+              storage: 11Gi
+        source:
+          pvc:
+            namespace: openshift-virtualization-os-images
+            name: podman-remote
   running: true
   template:
     metadata:
-      annotations:
-        vm.kubevirt.io/flavor: small
-        vm.kubevirt.io/os: fedora
-        vm.kubevirt.io/workload: server
       labels:
-        kubevirt.io/domain: fedora38
+        kubevirt.io/domain: quarkus-dev
         kubevirt.io/size: small
     spec:
       accessCredentials:
@@ -59,19 +54,9 @@ spec:
               name: default
           networkInterfaceMultiqueue: true
           rng: {}
-        features:
-          acpi: {}
-          smm:
-            enabled: true
-        firmware:
-          bootloader:
-            efi: {}
-        machine:
-          type: pc-q35-rhel9.2.0
         resources:
           requests:
             memory: 2Gi
-      evictionStrategy: LiveMigrate
       networks:
         - name: default
           pod: {}
@@ -80,12 +65,8 @@ spec:
         - cloudInitConfigDrive:
             userData: |-
               #cloud-config
-              user: fedora
-              password: rhpass
-              chpasswd: { expire: False }
-              runcmd:
-              - curl -sSL https://raw.githubusercontent.com/iocanel/openshift-vm-playground/main/resources/config.sh | bash
+              hostname: quarkus-dev
           name: cloudinitdisk
         - dataVolume:
-            name: fedora38
+            name: quarkus-dev-disk
           name: rootdisk

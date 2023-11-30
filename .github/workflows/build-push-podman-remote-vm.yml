@@ -1,0 +1,59 @@
+name: build push podman-remote vm
+
+on:
+  workflow_dispatch:
+
+env:
+  LIBGUESTFS_BACKEND: direct
+  OS_IMAGE: https://fedora.mirrorservice.org/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-38-1.6.x86_64.qcow2
+  QUAY_ORG: snowdrop
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install libguestfs tools
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libguestfs-tools
+
+      - name: Download the Fedora Cloud image
+        run: |
+          curl -L -o disk.img ${OS_IMAGE}
+
+      - name: Customize the VM
+        run: |
+          export LIBGUESTFS_DEBUG=1 LIBGUESTFS_TRACE=1
+          
+          sudo virt-customize -a disk.img --install cloud-init,podman,openssh-server,socat,qemu-guest-agent
+          
+          sudo virt-customize -a disk.img \
+            --root-password password:test \
+            --run ./resources/vm-customization/script -v
+
+          sudo virt-sparsify --in-place disk.img
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: quarkus-dev-vm
+          tags: latest ${{ github.sha }}
+          containerfiles: |
+            ./resources/vm-customization/Dockerfile
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/${QUAY_ORG}
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
