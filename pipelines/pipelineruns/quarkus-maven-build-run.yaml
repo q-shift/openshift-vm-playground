@@ -9,7 +9,7 @@ spec:
     - name: debug
       value: "false"
     - name: url
-      value: "https://github.com/iocanel/quarkus-helloworld"
+      value: "https://github.com/ch007m/quarkus-helloworld"
     - name: virtualMachineName
       value: "fedora38"
   workspaces:
