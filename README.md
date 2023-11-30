@@ -24,12 +24,12 @@ kubectl create secret generic fedora-ssh-key -n <NAMESPACE> --from-file=key=~/.s
 ```
 - When done, create a VirtualMachine
 ```bash
-kubectl delete -n <NAMESPACE> vm/fedora38
-kubectl apply -n <NAMESPACE> -f resources/vm-fedora38.yml
+kubectl delete -n <NAMESPACE> vm/quarkus-dev-vm
+kubectl apply -n <NAMESPACE> -f resources/quarkus-dev-virtualmachine.yml
 ```
 - If a loadbalancer is available on the platform where the cluster is running, then deploy a Service of type `Loabalancer` to access it using a ssh client
 ```bash
-kubectl apply -f resources/service.yml
+kubectl apply -f resources/services/service.yml
 ...
 # Wait till you got an external IP address
 VM_IP=$(kubectl get svc/fedora38-loadbalancer-ssh-service -ojson | jq -r '.status.loadBalancer.ingress[].ip')
@@ -38,7 +38,45 @@ ssh -p 22000 fedora@$VM_IP
 
 **NOTE**: If you have installed the virtctl client, you can also ssh to the vm using the following command able to forward the traffic:
 ```bash
-virtctl ssh --local-ssh fedora@fedora38
+virtctl ssh --local-ssh fedora@<VM_NAME>
+```
+
+## Customizing the Fedora Cloud image
+
+By default, podman, socat packages are not installed within the Fedora Cloud image. They can be installed using `CloudInit` but that means that
+the process to create a KubeVirt VirtualMachine will take more time. To avoid this, we have created a GitHub Action flow able to customize the Fedora cloud 
+image using the tool: `virt-customize`. See: `.github/workflows/build-push-podman-remote-vm.yml`.
+
+**Note**: The flow is not triggered for each commit and by consequence if some changes are needed, you will have first to push your changes and next to launch the flow using either the GitHub Action UI or the client `gh workflow run build-push-podman-remote-vm.yml`
+
+The image generated is available under the Quay registry: `quay.io/snowdrop/quarkus-dev-vm`
+The image can be next deployed `kubectl apply -f resources/quarkus-dev-virtualmachine.yml` within the ocp cluster using a DataVolume resource under the namespace hosting the different OSes `openshift-virtualization-os-images`
+
+Now, you will be able to consume it for every VirtualMachine you will create if you include this `DataVolumeTemplate`: 
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: quarkus-dev
+  labels:
+    app: quarkus-dev
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: quarkus-dev
+      spec:
+        pvc:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 11Gi
+        source:
+          pvc:
+            namespace: openshift-virtualization-os-images
+            name: podman-remote
 ```
 
 ## Build a Quarkus application using Tekton
@@ -101,7 +139,7 @@ execute this command:
 ./e2e.sh -v <VM_NAME> -n <NAMESPACE> -p <PUBLIC_KEY_FILE_PATH>
 ```
 where:
-- <VM_NAME>: name of the virtual machine and also OS image to download (e.g fedora38 = quay.io/containerdisks/fedora:38)
+- <VM_NAME>: name of the virtual machine and also OS image to download (e.g Fedora Cloud customized = quay.io/snowdrop/quarkus-dev-vm)
 - <NAMESPACE>: kubernetes namespace where scenario should be deployed and tested
 - <PUBLIC_KEY_FILE_PATH>: path to the file containing the public key to be imported within the VM
 
