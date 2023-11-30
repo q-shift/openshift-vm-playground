@@ -23,3 +23,4 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable podman-remote.service
+sudo systemctl start podman-remote.service
