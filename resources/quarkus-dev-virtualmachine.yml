@@ -19,7 +19,7 @@ spec:
               storage: 11Gi
         source:
           pvc:
-            namespace: openshift-virtualization-os-images
+            namespace: vm-images # openshift-virtualization-os-images
             name: podman-remote
   running: true
   template:
@@ -65,7 +65,7 @@ spec:
         - cloudInitConfigDrive:
             userData: |-
               #cloud-config
-              hostname: quarkus-dev
+              hostname: quarkus-dev-vm
           name: cloudinitdisk
         - dataVolume:
             name: quarkus-dev-disk

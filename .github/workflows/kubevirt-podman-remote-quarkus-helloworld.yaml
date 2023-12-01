@@ -94,8 +94,12 @@ jobs:
           ssh-keygen -N "" -f id_rsa
           kubectl create secret generic fedora-ssh-key -n default --from-file=key=id_rsa.pub
           
-          echo "## Creating a VM"
-          kubectl apply -f .github/resources/quarkus-dev-vm.yml
+          echo "## Creating a DataVolume using as registry image our customized Fedora Cloud OS packaging: podman, socat"
+          kubectl create ns vm-images
+          kubectl apply -n vm-images -f resources/quay-to-pvc-datavolume.yml
+          
+          echo "## Creating a VM ..."
+          kubectl apply -f resources/quarkus-dev-virtualmachine.yml
           kubectl wait --for=condition=Ready vm/quarkus-dev-vm --timeout=5m
 
       - name: Grant more rights to the default serviceaccount to access Kubevirt API
