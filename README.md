@@ -1,5 +1,18 @@
 # OpenShift VM Playground
 
+Table of Contents
+=================
+
+  * [Prerequisites](#prerequisites)
+  * [Instructions to create a VM and to ssh to it](#instructions-to-create-a-vm-and-to-ssh-to-it)
+  * [Customizing the Fedora Cloud image](#customizing-the-fedora-cloud-image)
+  * [Build a Quarkus application using Tekton](#build-a-quarkus-application-using-tekton)
+      * [Replay the pipeline](#replay-the-pipeline)
+  * [End-to-end test](#end-to-end-test)
+  * [Access podman remotely](#access-podman-remotely)
+  * [GitHub Workflows](#github-workflows)
+  * [Issues](#issues)
+
 ## Prerequisites
 
 - [virtctl](https://docs.openshift.com/container-platform/4.13/virt/virt-using-the-cli-tools.html#installing-virtctl_virt-using-the-cli-tools) client (optional)
@@ -127,7 +140,7 @@ tkn pr logs quarkus-maven-build-run -f
 
 ## End-to-end test
 
-To play with Kubevirt & Tekton to execute an end to end test case where we:
+To play with Kubevirt & Tekton to execute an end-to-end test case where we:
 - Create a Virtual Machine 
 - Provision it to install podman, socat
 - Expose the podman daemon using socat
@@ -139,7 +152,7 @@ execute this command:
 ./e2e.sh -v <VM_NAME> -n <NAMESPACE> -p <PUBLIC_KEY_FILE_PATH>
 ```
 where:
-- <VM_NAME>: name of the virtual machine and also OS image to download (e.g Fedora Cloud customized = quay.io/snowdrop/quarkus-dev-vm)
+- <VM_NAME>: name of the virtual machine and also OS image to download (e.g. Fedora Cloud customized = quay.io/snowdrop/quarkus-dev-vm)
 - <NAMESPACE>: kubernetes namespace where scenario should be deployed and tested
 - <PUBLIC_KEY_FILE_PATH>: path to the file containing the public key to be imported within the VM
 
@@ -170,9 +183,19 @@ Writing manifest to image destination
 e2b3db5d4fdf670b56dd7138d53b5974f2893a965f7d37486fbb9fcbf5e91d9d
 ```
 
+## GitHub Workflows
+
+This project includes some GitHub Actions flows able to:
+- Build and push the Fedora Cloud image customized with podman, socat on quay/snowdrop. See: `.github/workflows/build-push-podman-remote-vm.yml`
+- Create a kind cluster + kubevirt and perform using Tekton the [End-to-end scenario](#end-to-end-test): See: `.github/workflows/kubevirt-podman-remote-quarkus-helloworld.yaml`
+
+**NOTE**: As the target platform used here is kubernetes and not ocp, then some adjustments are needed .This is the reason why different `kustomization.yaml` files have been created !
+
+**NOTE**: The flow to build the customized image must be executed manually using the GitHub UI or client !
+
 ## Issues
 
-The step to setup a network bridge is not needed to allow the pods to access the VM within the cluster as a Kuybernetes Service is required in this case
+The step to set up a network bridge is not needed to allow the pods to access the VM within the cluster as a Kuybernetes Service is required in this case
 When we tried to use the `Network Attachment Definition`een faced to the following error: `0/6 nodes are available: 3 Insufficient devices.kubevirt.io/kvm, 3 Insufficient devices.kubevirt.io/tun, 3 Insufficient devices.kubevirt.io/vhost-net, 3 node(s) didn't match node selector, 6 Insufficient bridge-cni.network.kubevirt.io/br1`. 
 To fix it, follow the instructions described within this ticket: https://bugzilla.redhat.com/show_bug.cgi?id=1727810
 
