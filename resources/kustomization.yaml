@@ -13,4 +13,4 @@ patches:
     group: kubevirt.io
     version: v1
     kind: VirtualMachine
-    name: quarkus-dev
+    name: quarkus-dev-vm
