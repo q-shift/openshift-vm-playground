@@ -88,6 +88,10 @@ jobs:
           curl -LO https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLIENT}/tektoncd-cli-${TEKTON_CLIENT}_Linux-64bit.deb
           sudo dpkg -i ./tektoncd-cli-${TEKTON_CLIENT}_Linux-64bit.deb
 
+      - name: Grant more rights to the default serviceaccount to access Kubevirt API
+        run: |
+          kubectl create clusterrolebinding pod-kubevirt-viewer --clusterrole=kubevirt.io:view --serviceaccount=default:default
+
       - name: Creating a VM and generating a SSH key (private/public)
         run: |
           echo "## Creating the kubernetes secret storing the public key"
@@ -101,10 +105,6 @@ jobs:
           echo "## Kustomize the VM yaml resource to the vm-images namespace instead of the default on ocp and create it ..."
           kustomize build resources  | kubectl apply -f -
           kubectl wait --for=condition=Ready vm/quarkus-dev-vm --timeout=5m
-
-      - name: Grant more rights to the default serviceaccount to access Kubevirt API
-        run: |
-          kubectl create clusterrolebinding pod-kubevirt-viewer --clusterrole=kubevirt.io:view --serviceaccount=default:default
 
       - name: Wait till podman remote replies
         run: |
