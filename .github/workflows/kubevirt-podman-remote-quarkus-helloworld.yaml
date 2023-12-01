@@ -135,7 +135,7 @@ jobs:
       - name: Run the Quarkus HelloWorld test case using Tekton to git clone, test and deploy the image/app on k8s
         run : |
           echo "Kustomize the PVC resources to use as storageClass: standard"
-          kustomize build pipelines/setup/kustomization.yaml | kubectl apply -f -
+          kustomize build pipelines/setup | kubectl apply -f -
           #kubectl apply -f pipelines/setup/project-pvc.yaml
           #kubectl apply -f pipelines/setup/m2-repo-pvc.yaml
           
