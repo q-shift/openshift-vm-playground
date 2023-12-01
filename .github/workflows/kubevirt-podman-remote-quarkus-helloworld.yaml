@@ -1,0 +1,208 @@
+name: Run kubevirt on kind
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  KUBEVIRT_VERSION: v1.0.0
+  KUBEVIRT_CDI_VERSION: v1.57.0
+  KUBEVIRT_COMMON_INSTANCETYPES_VERSION: v0.3.2
+  KUBEVIRT_TEKTON_TASKS: v0.16.0
+
+  TEKTON_CLIENT: 0.33.0
+
+jobs:
+  kubevirt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create kind cluster
+        run: |
+          kind create cluster
+
+      - name: Log OS, kube tools, container versions
+        run: |
+          echo "########### OS ###########"
+          cat /etc/os-release
+          
+          echo "########### Kind version ###########"
+          kind --version
+          
+          echo "########### Docker version ###########"
+          docker -v
+          
+          echo "########### kubectl version ###########"
+          kubectl version --client
+          
+          echo "########### Kubevirt version: $KUBEVIRT_VERSION ###########"
+
+      - name: Deploy kubevirt
+        run: |          
+          function is_nested_virt_enabled() {
+            kvm_nested="unknown"
+            if [ -f "/sys/module/kvm_intel/parameters/nested" ]; then
+              kvm_nested=$( cat /sys/module/kvm_intel/parameters/nested )
+            elif [ -f "/sys/module/kvm_amd/parameters/nested" ]; then
+              kvm_nested=$( cat /sys/module/kvm_amd/parameters/nested )
+            fi
+            [ "$kvm_nested" == "1" ] || [ "$kvm_nested" == "Y" ] || [ "$kvm_nested" == "y" ]
+          }
+          
+          echo "Deploying KubeVirt"
+          kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml"
+          kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml"
+          
+          echo "Configuring Kubevirt to use emulation if needed"
+          if ! is_nested_virt_enabled; then
+            kubectl -n kubevirt patch kubevirt kubevirt --type=merge --patch '{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'
+          fi
+          
+          echo "Deploying KubeVirt containerized-data-importer"
+          kubectl apply -f "https://github.com/kubevirt/containerized-data-importer/releases/download/${KUBEVIRT_CDI_VERSION}/cdi-operator.yaml"
+          kubectl apply -f "https://github.com/kubevirt/containerized-data-importer/releases/download/${KUBEVIRT_CDI_VERSION}/cdi-cr.yaml"
+          
+          echo "Waiting for KubeVirt to be ready"
+          kubectl wait --for=condition=Available kubevirt kubevirt --namespace=kubevirt --timeout=5m
+          
+          echo "Patch the StorageProfile to use the storageclass standard and give ReadWrite access"
+          kubectl patch --type merge -p '{"spec": {"claimPropertySets": [{"accessModes": ["ReadWriteOnce"]}]}}' StorageProfile standard
+          
+          echo "Successfully deployed KubeVirt, CDI:"
+          kubectl get pods -n kubevirt
+          kubectl get pods -n cdi
+      
+
+      - name: Deploy Tekton
+        run: |
+          kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+          kubectl wait deployment -n tekton-pipelines tekton-pipelines-controller --for condition=Available=True --timeout=90s
+          kubectl wait deployment -n tekton-pipelines tekton-pipelines-webhook --for condition=Available=True --timeout=90s
+          
+          #https://github.com/kubevirt/kubevirt-tekton-tasks/releases/download/${KUBEVIRT_TEKTON_TASKS}/kubevirt-tekton-tasks-kubernetes.yaml
+          
+          curl -LO https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLIENT}/tektoncd-cli-${TEKTON_CLIENT}_Linux-64bit.deb
+          sudo dpkg -i ./tektoncd-cli-${TEKTON_CLIENT}_Linux-64bit.deb
+
+      - name: Creating a VM and generating a SSH key (private/public)
+        run: |
+          echo "## Creating the kubernetes secret storing the public key"
+          ssh-keygen -N "" -f id_rsa
+          kubectl create secret generic fedora-ssh-key -n default --from-file=key=id_rsa.pub
+          
+          echo "## Creating a VM"
+          kubectl apply -f .github/resources/quarkus-dev-vm.yml
+          kubectl wait --for=condition=Ready vm/quarkus-dev-vm --timeout=5m
+
+      - name: Grant more rights to the default serviceaccount to access Kubevirt API
+        run: |
+          kubectl create clusterrolebinding pod-kubevirt-viewer --clusterrole=kubevirt.io:view --serviceaccount=default:default
+
+      - name: Wait till podman remote replies
+        run: |
+          VM_IP=$(kubectl get vmi -o jsonpath='{.items[0].status.interfaces[0].ipAddress}')
+          echo "VM IP is: $VM_IP"
+          
+          # Launch the podman client
+          kubectl run podname-client --image=quay.io/podman/stable -- "sleep" "1000000"
+          
+          # Wait for the pod to be in the Running state
+          kubectl wait --for condition=Ready pod/podname-client --timeout=360s
+          
+          echo "Wait for the command within the pod to succeed"
+          echo ">>>> Command to be executed to check healthiness of podman & socat"
+          echo ">>>> kubectl exec podname-client -- podman \"-r\" \"--url=tcp://$VM_IP:2376\" \"version\""
+          while true; do
+              kubectl exec podname-client -- podman "-r" "--url=tcp://$VM_IP:2376" "version"
+              if [ $? -eq 0 ]; then
+                  echo "Command within the pod succeeded."
+                  break
+              else
+                  echo "Remote podman is not yet ready to reply.."
+              fi
+              sleep 20
+          done
+
+      - name: Run the Quarkus HelloWorld test case using Tekton to git clone, test and deploy the image/app on k8s
+        run : |
+          kubectl apply -f pipelines/setup/project-pvc.yaml
+          kubectl apply -f pipelines/setup/m2-repo-pvc.yaml
+          kubectl apply -f pipelines/setup/configmap-maven-settings.yaml
+          
+          kubectl apply -f pipelines/tasks/git-clone.yaml
+          kubectl apply -f pipelines/tasks/rm-workspace.yaml
+          kubectl apply -f pipelines/tasks/ls-workspace.yaml
+          kubectl apply -f pipelines/tasks/maven.yaml
+          kubectl apply -f pipelines/tasks/virtualmachine.yaml
+          kubectl apply -f pipelines/pipelines/quarkus-maven-build.yaml
+          kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-run.yaml
+          
+          echo "Wait a few second till the pipelineRun is created/started"
+          sleep 10s
+          
+          # kubectl wait --for=condition=SUCCEEDED=True --timeout=600s pipelinerun quarkus-maven-build-run
+          
+          STATUS=$(kubectl get pipelinerun quarkus-maven-build-run -o json | jq -rc .status.conditions[0].status)
+          LIMIT=$((SECONDS+600))
+          while [ "${STATUS}" != "True" ]; do
+            if [ $SECONDS -gt $LIMIT ]; then
+              echo "Timeout waiting for PipelineRun to complete"
+              exit 2
+            fi
+            sleep 20
+            MSG=$(kubectl get pipelinerun quarkus-maven-build-run -o json | jq -rc .status.conditions[0].message)
+            STATUS=$(kubectl get pipelinerun quarkus-maven-build-run -o json | jq -rc .status.conditions[0].status)
+            echo "Waiting for PipelineRun to complete: $MSG; $STATUS"
+          done
+
+      - name: (Only if it succeeded) Log messages
+        if: success()
+        run: |
+          echo "########### All PODs ################"
+          kubectl get pod -A
+          
+          echo "########### All Services ################"
+          kubectl get svc -A
+          
+          echo "######### Tekton describe ################"
+          tkn pipelinerun describe quarkus-maven-build-run
+          
+          echo "######### Tekton logs ################"
+          tkn pipelinerun logs quarkus-maven-build-run
+
+      - name: (Only if it failed) Log messages
+        if: failure()
+        run: |
+          echo "########### All PODs ################"
+          kubectl get pod -A
+          
+          echo "########### Virt Handler & controller logs ################"
+          kubectl logs -lkubevirt.io=virt-handler -n kubevirt
+          kubectl logs -lkubevirt.io=virt-controller -n kubevirt
+          
+          echo "########### VM status ################"
+          kubectl get virtualmachine/quarkus-dev-vm -oyaml
+          
+          echo "########### Describe VM ################"
+          kubectl describe virtualmachine/quarkus-dev-vm
+          
+          echo "########### DataVolume ################"
+          kubectl describe datavolume/quarkus-dev-vm
+          #kubectl get datavolume/quarkus-dev-vm -oyaml
+          
+          echo "########### VMI status ################"
+          kubectl get vmi -A -oyaml
+          
+          #echo "######### PVC ################"
+          #kubectl get pvc -A
+          
+          echo "######### Tekton describe ################"
+          tkn pipelinerun describe quarkus-maven-build-run
+          
+          echo "######### Tekton logs ################"
+          tkn pipelinerun logs quarkus-maven-build-run
+
