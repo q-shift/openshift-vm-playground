@@ -198,15 +198,8 @@ jobs:
           echo "########### Describe VM ################"
           kubectl describe virtualmachine/quarkus-dev-vm
           
-          echo "########### DataVolume ################"
-          kubectl describe datavolume/quarkus-dev-vm
-          #kubectl get datavolume/quarkus-dev-vm -oyaml
-          
           echo "########### VMI status ################"
           kubectl get vmi -A -oyaml
-          
-          #echo "######### PVC ################"
-          #kubectl get pvc -A
           
           echo "######### Tekton describe ################"
           tkn pipelinerun describe quarkus-maven-build-run
