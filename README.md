@@ -57,15 +57,15 @@ Now, you will be able to consume it for every VirtualMachine you will create if 
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: quarkus-dev
+  name: quarkus-dev-vm
   labels:
-    app: quarkus-dev
+    app: quarkus-dev-vm
 spec:
   dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
       metadata:
-        name: quarkus-dev
+        name: quarkus-dev-vm
       spec:
         pvc:
           accessModes:

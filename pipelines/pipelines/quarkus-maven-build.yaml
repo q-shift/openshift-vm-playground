@@ -94,6 +94,7 @@ spec:
           value: "tcp://$(tasks.virtualmachine.results.ip):2376"
         - name: GOALS
           value:
+          - -B
           - test
       workspaces:
         - name: maven-settings
@@ -111,6 +112,7 @@ spec:
         - name: GOALS
           value:
             - quarkus:deploy
+            - -B
             - -Dquarkus.openshift.build-strategy=docker
             - -Dquarkus.openshift.deploy=true
             - -Dquarkus.container-image.build=true

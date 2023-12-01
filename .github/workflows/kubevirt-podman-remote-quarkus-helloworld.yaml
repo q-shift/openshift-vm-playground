@@ -98,8 +98,8 @@ jobs:
           kubectl create ns vm-images
           kubectl apply -n vm-images -f resources/quay-to-pvc-datavolume.yml
           
-          echo "## Creating a VM ..."
-          kubectl apply -f resources/quarkus-dev-virtualmachine.yml
+          echo "## Kustomize the VM yaml resource to the vm-images namespace instead of the default on ocp and create it ..."
+          kustomize build resources  | kubectl apply -f -
           kubectl wait --for=condition=Ready vm/quarkus-dev-vm --timeout=5m
 
       - name: Grant more rights to the default serviceaccount to access Kubevirt API
@@ -133,8 +133,11 @@ jobs:
 
       - name: Run the Quarkus HelloWorld test case using Tekton to git clone, test and deploy the image/app on k8s
         run : |
-          kubectl apply -f pipelines/setup/project-pvc.yaml
-          kubectl apply -f pipelines/setup/m2-repo-pvc.yaml
+          echo "Kustomize the PVC resources to use as storageClass: standard"
+          kustomize build pipelines/setup/kustomization.yaml | kubectl apply -f -
+          #kubectl apply -f pipelines/setup/project-pvc.yaml
+          #kubectl apply -f pipelines/setup/m2-repo-pvc.yaml
+          
           kubectl apply -f pipelines/setup/configmap-maven-settings.yaml
           
           kubectl apply -f pipelines/tasks/git-clone.yaml

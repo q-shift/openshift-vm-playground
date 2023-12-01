@@ -1,15 +1,15 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: quarkus-dev
+  name: quarkus-dev-vm
   labels:
-    app: quarkus-dev
+    app: quarkus-dev-vm
 spec:
   dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
       metadata:
-        name: quarkus-dev-disk
+        name: quarkus-dev-vm-disk
       spec:
         pvc:
           accessModes:
@@ -19,13 +19,13 @@ spec:
               storage: 11Gi
         source:
           pvc:
-            namespace: vm-images # openshift-virtualization-os-images
+            namespace: openshift-virtualization-os-images
             name: podman-remote
   running: true
   template:
     metadata:
       labels:
-        kubevirt.io/domain: quarkus-dev
+        kubevirt.io/domain: quarkus-dev-vm
         kubevirt.io/size: small
     spec:
       accessCredentials:
@@ -68,5 +68,5 @@ spec:
               hostname: quarkus-dev-vm
           name: cloudinitdisk
         - dataVolume:
-            name: quarkus-dev-disk
+            name: quarkus-dev-vm-disk
           name: rootdisk
