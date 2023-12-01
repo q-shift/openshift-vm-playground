@@ -146,7 +146,8 @@ jobs:
           kubectl apply -f pipelines/tasks/ls-workspace.yaml
           kubectl apply -f pipelines/tasks/maven.yaml
           kubectl apply -f pipelines/tasks/virtualmachine.yaml
-          kubectl apply -f pipelines/pipelines/quarkus-maven-build.yaml
+          #kubectl apply -f pipelines/pipelines/quarkus-maven-build.yaml
+          kustomize build pipelines/pipelines | kubectl apply -f -
           kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-run.yaml
           
           echo "Wait a few second till the pipelineRun is created/started"
