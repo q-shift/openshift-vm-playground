@@ -12,7 +12,7 @@ patches:
         - quarkus:deploy
         - -B
         - -Dquarkus.kubernetes.build-strategy=docker
-        - -Dquarkus.kubernetes.deploy=false
+        - -Dquarkus.kubernetes.deploy=true
         - -Dquarkus.container-image.build=true
         - -Dquarkus.log.level=DEBUG
     target:
