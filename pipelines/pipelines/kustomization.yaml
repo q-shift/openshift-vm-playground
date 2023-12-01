@@ -7,14 +7,14 @@ resources:
 patches:
   - patch: |
       - op: replace #action
-        path: /spec/tasks/6/params/1 # !! Index must be hard coded
+        path: /spec/tasks/6/params/1/value # !! Index must be hard coded
         value:
-          - quarkus:deploy
-          - -B
-          - -Dquarkus.kubernetes.build-strategy=docker
-          - -Dquarkus.kubernetes.deploy=false
-          - -Dquarkus.container-image.build=true
-          - -Dquarkus.log.level=DEBUG
+        - quarkus:deploy
+        - -B
+        - -Dquarkus.kubernetes.build-strategy=docker
+        - -Dquarkus.kubernetes.deploy=false
+        - -Dquarkus.container-image.build=true
+        - -Dquarkus.log.level=DEBUG
     target:
       group: tekton.dev
       version: v1
