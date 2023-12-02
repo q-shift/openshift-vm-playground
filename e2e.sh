@@ -83,7 +83,7 @@ if [ -z "$REUSE_VM" ]; then
   echo "Public key file: $PUBLIC_KEY_FILE_PATH"
   
   # Create the secret hosting the public key
-  kubectl create secret generic fedora-ssh-key --from-file=key=$PUBLIC_KEY_FILE_PATH
+  kubectl create secret generic quarkus-dev-ssh-key --from-file=key=$PUBLIC_KEY_FILE_PATH
   
   # Create the PVCs needed by Tekton (project, m2) and ConfigMap containing the maven settings
   kubectl apply -f pipelines/setup/project-pvc.yaml
@@ -94,7 +94,7 @@ if [ -z "$REUSE_VM" ]; then
   start_time=$(date +%s)
   
   # Deploying a VM
-  kubectl apply -f resources/vm-$VM_NAME.yml
+  kubectl apply -f resources/$VM_NAME-virtualmachine.yml
   
   # Wait till socat is up and running
   #VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAddress')
@@ -140,6 +140,7 @@ VM_IP=$(kubectl get vmi/${VM_NAME} -ojson | jq -r '.status.interfaces[] | .ipAdd
 echo "IP of the VM - $VM_NAME: $VM_IP"
 
 # Run the pod
+kubectl delete pod podname-client 2> /dev/null
 kubectl run -n "$NAMESPACE" podname-client --image=quay.io/podman/stable -- "sleep" "1000000" &
 
 # Wait for the pod to be in the Running state

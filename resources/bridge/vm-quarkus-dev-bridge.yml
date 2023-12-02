@@ -39,7 +39,7 @@ spec:
               configDrive: {}
             source:
               secret:
-                secretName: fedora-ssh-key
+                secretName: quarkus-dev-ssh-key
       domain:
         cpu:
           cores: 1

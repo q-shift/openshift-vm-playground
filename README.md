@@ -33,11 +33,11 @@ oc new-project <NAMESPACE>
 ```
 - Create a Kubernetes secret using your public key needed to ssh to the VM
 ```bash
-kubectl create secret generic fedora-ssh-key -n <NAMESPACE> --from-file=key=~/.ssh/<PUBLIC_KEY_FILE>.pub                  
+kubectl create secret generic quarkus-dev-ssh-key -n <NAMESPACE> --from-file=key=~/.ssh/<PUBLIC_KEY_FILE>.pub                  
 ```
 - When done, create a VirtualMachine
 ```bash
-kubectl delete -n <NAMESPACE> vm/quarkus-dev-vm
+kubectl delete -n <NAMESPACE> vm/quarkus-dev
 kubectl apply -n <NAMESPACE> -f resources/quarkus-dev-virtualmachine.yml
 ```
 - If a loadbalancer is available on the platform where the cluster is running, then deploy a Service of type `Loabalancer` to access it using a ssh client
@@ -70,15 +70,15 @@ Now, you will be able to consume it for every VirtualMachine you will create if 
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: quarkus-dev-vm
+  name: quarkus-dev
   labels:
-    app: quarkus-dev-vm
+    app: quarkus-dev
 spec:
   dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
       metadata:
-        name: quarkus-dev-vm
+        name: quarkus-dev
       spec:
         pvc:
           accessModes:

@@ -9,9 +9,9 @@ spec:
     - name: debug
       value: "false"
     - name: url
-      value: "https://github.com/ch007m/quarkus-helloworld"
+      value: "https://github.com/iocanel/quarkus-helloworld"
     - name: virtualMachineName
-      value: "quarkus-dev-vm"
+      value: "quarkus-dev"
   workspaces:
     - name: project-dir
       persistentVolumeClaim:
