@@ -101,6 +101,8 @@ spec:
           workspace: maven-settings
         - name: project-dir
           workspace: project-dir
+        - name: maven-m2-repo
+          workspace: maven-m2-repo
     - name: maven-build-image-deploy
       runAfter:
         - maven-test
@@ -117,9 +119,11 @@ spec:
             - -Dquarkus.openshift.deploy=true
             - -Dquarkus.container-image.build=true
             - -Dquarkus.log.level=DEBUG
+            - -DskipTests
       workspaces:
         - name: maven-settings
           workspace: maven-settings
         - name: project-dir
           workspace: project-dir
-
+        - name: maven-m2-repo
+          workspace: maven-m2-repo
