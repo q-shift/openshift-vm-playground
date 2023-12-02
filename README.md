@@ -45,7 +45,7 @@ kubectl apply -n <NAMESPACE> -f resources/quarkus-dev-virtualmachine.yml
 kubectl apply -f resources/services/service.yml
 ...
 # Wait till you got an external IP address
-VM_IP=$(kubectl get svc/fedora38-loadbalancer-ssh-service -ojson | jq -r '.status.loadBalancer.ingress[].ip')
+VM_IP=$(kubectl get svc/quarkus-dev-loadbalancer-ssh-service -ojson | jq -r '.status.loadBalancer.ingress[].ip')
 ssh -p 22000 fedora@$VM_IP
 ```
 
@@ -199,4 +199,4 @@ The step to set up a network bridge is not needed to allow the pods to access th
 When we tried to use the `Network Attachment Definition`een faced to the following error: `0/6 nodes are available: 3 Insufficient devices.kubevirt.io/kvm, 3 Insufficient devices.kubevirt.io/tun, 3 Insufficient devices.kubevirt.io/vhost-net, 3 node(s) didn't match node selector, 6 Insufficient bridge-cni.network.kubevirt.io/br1`. 
 To fix it, follow the instructions described within this ticket: https://bugzilla.redhat.com/show_bug.cgi?id=1727810
 
-**TIP**: Don't create using ocp 4.13.x the bridge using the UI as documented [here](https://github.com/rhpds/roadshow_ocpvirt_instructions/blob/summit/workshop/content/06_network_management.adoc)e can also create a service using the virtctl client: `virtctl expose vmi fedora38 --name=fedora38 --port=2376 --target-port=2376`
+**TIP**: Don't create using ocp 4.13.x the bridge using the UI as documented [here](https://github.com/rhpds/roadshow_ocpvirt_instructions/blob/summit/workshop/content/06_network_management.adoc)e can also create a service using the virtctl client: `virtctl expose vmi quarkus-dev --name=quarkus-dev --port=2376 --target-port=2376`

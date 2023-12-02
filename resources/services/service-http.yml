@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fedora38-http-service
+  name: quarkus-dev-http-service
 spec:
   ports:
     - protocol: TCP
       port: 9000
       targetPort: 9000
   selector:
-    kubevirt.io/domain: fedora38
+    kubevirt.io/domain: quarkus-dev
   sessionAffinity: None
   type: LoadBalancer

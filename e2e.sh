@@ -6,9 +6,9 @@
 #  Examples:
 #
 #   ./e2e.sh 
-#   ./e2e.sh -v fedora38
-#   ./e2e.sh -v fedora38 -p ~/.ssh/somekey_rsa.pub
-#   ./e2e.sh -n test1 -v fedora38 -p ~/.ssh/id_rsa.pub
+#   ./e2e.sh -v quarkus-dev
+#   ./e2e.sh -v quarkus-dev -p ~/.ssh/somekey_rsa.pub
+#   ./e2e.sh -n test1 -v quarkus-dev -p ~/.ssh/id_rsa.pub
 
 if command -v virtctl &> /dev/null; then
    :  # Command exists, do nothing (null command)
@@ -18,7 +18,7 @@ else
 fi
 
 NAMESPACE=""
-VM_NAME="fedora38"
+VM_NAME="quarkus-dev"
 PUBLIC_KEY_FILE_PATH="${HOME}/.ssh/id_rsa.pub"
 REUSE_VM=""
 

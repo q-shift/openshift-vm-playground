@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fedora38-service
+  name: quarkus-dev-service
   namespace: development
 spec:
   externalIPs:
@@ -17,6 +17,6 @@ spec:
       protocol: TCP
       targetPort: 22
   selector:
-    kubevirt.io/domain: fedora38
+    kubevirt.io/domain: quarkus-dev
   sessionAffinity: None
   type: NodePort
