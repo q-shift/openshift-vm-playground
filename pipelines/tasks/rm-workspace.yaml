@@ -16,5 +16,5 @@ spec:
         - sh
         - -c
       args:
-        - rm -rf * && rm -rf .git && rm -rf .argocd && rm -rf .mvn && rm -rf .gitignore && rm -rf .dockerignore
+        - rm -rf * && rm -rf .[^.]*
         - ls -la
