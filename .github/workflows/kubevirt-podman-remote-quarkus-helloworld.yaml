@@ -173,9 +173,9 @@ jobs:
           echo "Wait a few second till the pipelineRun is created/started"
           sleep 10s
           
-          # kubectl wait --for=condition=SUCCEEDED=True --timeout=600s pipelinerun quarkus-maven-build-run
+          # kubectl wait --for=condition=SUCCEEDED=True --timeout=600s pipelinerun quarkus-maven-build
           
-          STATUS=$(kubectl get pipelinerun quarkus-maven-build-run -o json | jq -rc .status.conditions[0].status)
+          STATUS=$(kubectl get pipelinerun quarkus-maven-build -o json | jq -rc .status.conditions[0].status)
           LIMIT=$((SECONDS+600))
           while [ "${STATUS}" != "True" ]; do
             if [ $SECONDS -gt $LIMIT ]; then
@@ -183,8 +183,8 @@ jobs:
               exit 2
             fi
             sleep 20
-            MSG=$(kubectl get pipelinerun quarkus-maven-build-run -o json | jq -rc .status.conditions[0].message)
-            STATUS=$(kubectl get pipelinerun quarkus-maven-build-run -o json | jq -rc .status.conditions[0].status)
+            MSG=$(kubectl get pipelinerun quarkus-maven-build -o json | jq -rc .status.conditions[0].message)
+            STATUS=$(kubectl get pipelinerun quarkus-maven-build -o json | jq -rc .status.conditions[0].status)
             echo "Waiting for PipelineRun to complete: $MSG; $STATUS"
           done
 
@@ -198,10 +198,10 @@ jobs:
           kubectl get svc -A
           
           echo "######### Tekton describe ################"
-          tkn pipelinerun describe quarkus-maven-build-run
+          tkn pipelinerun describe quarkus-maven-build
           
           echo "######### Tekton logs ################"
-          tkn pipelinerun logs quarkus-maven-build-run
+          tkn pipelinerun logs quarkus-maven-build
 
       - name: (Only if it failed) Log messages
         if: failure()
@@ -232,8 +232,8 @@ jobs:
           kubectl get datavolume,pvc -A
           
           echo "######### Tekton describe ################"
-          tkn pipelinerun describe quarkus-maven-build-run
+          tkn pipelinerun describe quarkus-maven-build
           
           echo "######### Tekton logs ################"
-          tkn pipelinerun logs quarkus-maven-build-run
+          tkn pipelinerun logs quarkus-maven-build
 
