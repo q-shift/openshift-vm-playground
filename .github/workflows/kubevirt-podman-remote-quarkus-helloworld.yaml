@@ -75,7 +75,6 @@ jobs:
           echo "Successfully deployed KubeVirt, CDI:"
           kubectl get pods -n kubevirt
           kubectl get pods -n cdi
-      
 
       - name: Deploy Tekton
         run: |
@@ -105,7 +104,7 @@ jobs:
           
           echo "## Kustomize the VM yaml resource to clone the PVC of the OS using the vm-images namespace instead of the default on ocp ..."
           kustomize build resources  | kubectl apply -f -
-          kubectl wait --for=condition=Ready vm/quarkus-dev --timeout=5m
+          kubectl wait --for=condition=Ready vm/quarkus-dev --timeout=600s
 
       - name: Wait till podman remote replies
         run: |
@@ -203,6 +202,9 @@ jobs:
           
           echo "########### VMI status ################"
           kubectl get vmi -A -oyaml
+          
+          echo "########### DataVolumes and PVC ################"
+          kubectl get datavolume,pvc -A
           
           echo "######### Tekton describe ################"
           tkn pipelinerun describe quarkus-maven-build-run
