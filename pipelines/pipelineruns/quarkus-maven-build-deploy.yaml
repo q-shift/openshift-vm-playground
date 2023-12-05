@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  name: quarkus-maven-build-deploy
+  name: quarkus-maven-build
 spec:
   pipelineRef:
     name: quarkus-maven-build
