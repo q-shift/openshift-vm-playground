@@ -82,6 +82,9 @@ jobs:
           kubectl wait deployment -n tekton-pipelines tekton-pipelines-controller --for condition=Available=True --timeout=90s
           kubectl wait deployment -n tekton-pipelines tekton-pipelines-webhook --for condition=Available=True --timeout=90s
           
+          echo "Disabling the affinity-assistant to avoid the error: more than one PersistentVolumeClaim is bound to a TaskRun = pod"
+          kubectl patch cm feature-flags -n tekton-pipelines -p '{"data":{"disable-affinity-assistant":"true"}}'
+          
           #https://github.com/kubevirt/kubevirt-tekton-tasks/releases/download/${KUBEVIRT_TEKTON_TASKS}/kubevirt-tekton-tasks-kubernetes.yaml
           
           curl -LO https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLIENT}/tektoncd-cli-${TEKTON_CLIENT}_Linux-64bit.deb
