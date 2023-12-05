@@ -206,6 +206,9 @@ jobs:
           echo "########### Virt launcher pod status ################"
           kubectl get pod -lkubevirt.io/domain=quarkus-dev -oyaml
           
+          echo "########### Describe Virt launcher pod ################"
+          kubectl describe pod -lkubevirt.io/domain=quarkus-dev
+          
           echo "########### DataVolumes and PVC ################"
           kubectl get datavolume,pvc -A
           
