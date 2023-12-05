@@ -131,7 +131,7 @@ jobs:
               sleep 20
           done
 
-      - name: Run the Quarkus HelloWorld test case using Tekton to git clone, test and deploy the image/app on k8s
+      - name: Run the Quarkus HelloWorld test case using Tekton pipeline
         run : |
           echo "Kustomize the PVC resources to use as storageClass: standard"
           kustomize build pipelines/setup | kubectl apply -f -
