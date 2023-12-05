@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  name: quarkus-maven-build-run
+  name: quarkus-maven-build-deploy
 spec:
   pipelineRef:
     name: quarkus-maven-build
@@ -9,7 +9,7 @@ spec:
     - name: debug
       value: "false"
     - name: deploy
-      value: "false"
+      value: "true"
     - name: url
       value: "https://github.com/iocanel/quarkus-helloworld"
     - name: virtualMachineName
@@ -24,3 +24,6 @@ spec:
     - name: maven-settings
       configMap:
         name: maven-settings
+    - name: dockerconfig-ws
+      secret:
+        secretName: dockerconfig-secret

@@ -134,6 +134,21 @@ jobs:
               sleep 20
           done
 
+      - name: Generate the docker.json file used by Quarkus JIB build as kubernetes secret
+        run: |
+          encodeAuth=$(echo "${{ secrets.QUAY_USERNAME }}:${{ secrets.QUAY_ROBOT_TOKEN }}" | base64 -w0)
+          echo "Auth encoded: $encodeAuth"
+          cat <<EOF > docker.json
+          {
+            "auths": {
+              "quay.io/${{ env.QUAY_ORG }}": {
+                "auth": "$encodeAuth"
+              }
+            }
+          }
+          EOF
+          kubectl create secret generic dockerconfig-secret --from-file=docker.json
+
       - name: Run the Quarkus HelloWorld test case using Tekton pipeline
         run : |
           echo "Kustomize the PVC resources to use as storageClass: standard"
@@ -152,7 +167,7 @@ jobs:
           #kubectl apply -f pipelines/pipelines/quarkus-maven-build.yaml
           kustomize build pipelines/pipelines | kubectl apply -f -
           
-          kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-test.yaml
+          kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-deploy.yaml
           
           echo "Wait a few second till the pipelineRun is created/started"
           sleep 10s
