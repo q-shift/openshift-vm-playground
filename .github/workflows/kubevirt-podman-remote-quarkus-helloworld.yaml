@@ -103,9 +103,9 @@ jobs:
           kubectl create ns vm-images
           kubectl apply -n vm-images -f resources/quay-to-pvc-datavolume.yml
           
-          echo "## Kustomize the VM yaml resource to the vm-images namespace instead of the default on ocp and create it ..."
+          echo "## Kustomize the VM yaml resource to clone the PVC of the OS using the vm-images namespace instead of the default on ocp ..."
           kustomize build resources  | kubectl apply -f -
-          kubectl wait --for=condition=Ready vm/quarkus-dev-vm --timeout=5m
+          kubectl wait --for=condition=Ready vm/quarkus-dev --timeout=5m
 
       - name: Wait till podman remote replies
         run: |
@@ -196,10 +196,10 @@ jobs:
           kubectl logs -lkubevirt.io=virt-controller -n kubevirt
           
           echo "########### VM status ################"
-          kubectl get virtualmachine/quarkus-dev-vm -oyaml
+          kubectl get virtualmachine/quarkus-dev -oyaml
           
           echo "########### Describe VM ################"
-          kubectl describe virtualmachine/quarkus-dev-vm
+          kubectl describe virtualmachine/quarkus-dev
           
           echo "########### VMI status ################"
           kubectl get vmi -A -oyaml
