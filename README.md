@@ -3,8 +3,8 @@
         <img src="https://img.shields.io/github/contributors/iocanel/openshift-vm-playground"/></a>
     <a href="https://github.com/iocanel/openshift-vm-playground/pulse" alt="Activity">
         <img src="https://img.shields.io/github/commit-activity/m/iocanel/openshift-vm-playground"/></a>
-    <a href="https://github.com/iocanel/openshift-vm-playground/actions/workflows/push.yml" alt="Build Status">
-        <img src="https://github.com/iocanel/openshift-vm-playground/actions/workflows/push.yml/badge.svg"></a>
+    <a href="https://github.com/iocanel/openshift-vm-playground/actions/workflows/kubevirt-podman-remote-quarkus-helloworld.yaml" alt="Build Status">
+        <img src="https://github.com/iocanel/openshift-vm-playground/actions/workflows/kubevirt-podman-remote-quarkus-helloworld.yaml/badge.svg"></a>
 </p>
 
 # OpenShift VM Playground
