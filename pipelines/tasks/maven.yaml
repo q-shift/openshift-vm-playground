@@ -22,6 +22,10 @@ spec:
     - name: maven-m2-repo
       description: Local repo (m2) workspace
       optional: true
+    - name: dockerconfig
+      description: >-
+        The workspace containing the docker config.
+      optional: true
   params:
     - name: MAVEN_IMAGE
       type: string
@@ -78,6 +82,10 @@ spec:
       type: string
       description: The docker host (e.g. tcp://hostvm.mynamspace:2376).
       default: "tcp://localhost:2376"
+    - name: DOCKER_CONFIG
+      type: string
+      description: Path to the docker.json file containing auths
+      default: ""
     - name: TESTCONTAINERS_RYUK_DISABLED
       type: string
       description: >-
@@ -162,6 +170,8 @@ spec:
       image: $(params.MAVEN_IMAGE)
       workingDir: $(workspaces.project-dir.path)/$(params.CONTEXT_DIR)
       env:
+        - name: DOCKER_CONFIG
+          value: "$(params.DOCKER_CONFIG)"
         - name: DOCKER_HOST
           value: "$(params.DOCKER_HOST)"
         - name: TESTCONTAINERS_RYUK_DISABLED
