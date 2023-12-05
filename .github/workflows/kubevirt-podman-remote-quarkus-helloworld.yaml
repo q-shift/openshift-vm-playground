@@ -96,7 +96,7 @@ jobs:
         run: |
           echo "## Creating the kubernetes secret storing the public key"
           ssh-keygen -N "" -f id_rsa
-          kubectl create secret generic fedora-ssh-key -n default --from-file=key=id_rsa.pub
+          kubectl create secret generic quarkus-dev-ssh-key -n default --from-file=key=id_rsa.pub
           
           echo "## Creating a DataVolume using as registry image our customized Fedora Cloud OS packaging: podman, socat"
           kubectl create ns vm-images
