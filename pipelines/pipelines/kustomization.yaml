@@ -9,11 +9,11 @@ patches:
       - op: replace #action
         path: /spec/tasks/6/params/1/value # !! Index must be hard coded
         value:
-        - quarkus:deploy
+        - package
+        - '-DskipTests'
         - -B
-        - -Dquarkus.kubernetes.build-strategy=docker
+        - -Dquarkus.container-image.image=quay.io/snowdrop/quarkus-dev-vm:latest
         - -Dquarkus.kubernetes.deploy=true
-        - -Dquarkus.container-image.build=true
         - -Dquarkus.log.level=DEBUG
     target:
       group: tekton.dev

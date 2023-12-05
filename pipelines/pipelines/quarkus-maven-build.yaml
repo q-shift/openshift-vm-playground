@@ -123,11 +123,11 @@ spec:
           value: $(workspaces.dockerconfig.path)/config.json
         - name: GOALS
           value:
-            - package
-            - '-DskipTests'
+            - quarkus:deploy
             - -B
-            - -Dquarkus.container-image.image=quay.io/snowdrop/quarkus-dev-vm:latest
-            - -Dquarkus.kubernetes.deploy=true
+            - -Dquarkus.openshift.build-strategy=docker
+            - -Dquarkus.openshift.deploy=true
+            - -Dquarkus.container-image.build=true
             - -Dquarkus.log.level=DEBUG
       workspaces:
         - name: maven-settings
