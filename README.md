@@ -198,6 +198,8 @@ This project includes some GitHub Actions flows able to:
 - Build and push the Fedora Cloud image customized with podman, socat on quay/snowdrop. See: `.github/workflows/build-push-podman-remote-vm.yml`
 - Create a kind cluster + kubevirt and perform using Tekton the [End-to-end scenario](#end-to-end-test): See: `.github/workflows/kubevirt-podman-remote-quarkus-helloworld.yaml`
 
+**WARNING**: Due to the following JIB build [issue](https://github.com/quarkusio/quarkus/issues/37469), we cannot build and deploy the resources yet using the GitHub workflow - kubevirt-podman-remote-quarkus-helloworld.yaml
+
 **NOTE**: As the target platform used here is kubernetes and not ocp, then some adjustments are needed .This is the reason why different `kustomization.yaml` files have been created !
 
 **NOTE**: The flow to build the customized image must be executed manually using the GitHub UI or client !

@@ -150,7 +150,7 @@ jobs:
           #kubectl apply -f pipelines/pipelines/quarkus-maven-build.yaml
           kustomize build pipelines/pipelines | kubectl apply -f -
           
-          kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-run.yaml
+          kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-test.yaml
           
           echo "Wait a few second till the pipelineRun is created/started"
           sleep 10s

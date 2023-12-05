@@ -14,6 +14,10 @@ spec:
       default: "false"
       name: debug
       type: string
+    - description: boolean which allows to deploy the application on the cluster with the generated resources
+      default: "true"
+      name: deploy
+      type: string
   workspaces:
     - name: project-dir
     - name: maven-m2-repo
@@ -103,9 +107,14 @@ spec:
           workspace: project-dir
         - name: maven-m2-repo
           workspace: maven-m2-repo
+
     - name: maven-build-image-deploy
       runAfter:
         - maven-test
+      when:
+        - input: $(params.deploy)
+          operator: in
+          values: [ "true" ]
       taskRef:
         name: maven
       params:
