@@ -168,7 +168,7 @@ jobs:
           #kubectl apply -f pipelines/pipelines/quarkus-maven-build.yaml
           kustomize build pipelines/pipelines | kubectl apply -f -
           
-          k get pipelines/quarkus-maven-build -oyaml
+          kubectl get pipelines/quarkus-maven-build -oyaml
           
           kubectl apply -f pipelines/pipelineruns/quarkus-maven-build-deploy.yaml
           
