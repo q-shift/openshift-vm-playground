@@ -126,7 +126,7 @@ spec:
             - package
             - '-DskipTests'
             - -B
-            - -Dquarkus.container-image.image=quay.io/ch007m/quarkus-dev-vm:latest
+            - -Dquarkus.container-image.image=quay.io/snowdrop/quarkus-dev-vm:latest
             - -Dquarkus.kubernetes.deploy=true
             - -Dquarkus.log.level=DEBUG
       workspaces:
