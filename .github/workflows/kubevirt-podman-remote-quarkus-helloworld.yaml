@@ -216,11 +216,16 @@ jobs:
           kubectl logs -lkubevirt.io=virt-handler -n kubevirt
           kubectl logs -lkubevirt.io=virt-controller -n kubevirt
           
+          echo "########### VM Importer pod ################"          
+          kubectl get -n vm-images pod/importer-podman-remote -oyaml
+          kubectl describe -n vm-images pod/importer-podman-remote
+          kubectl logs -n vm-images pod/importer-podman-remote
+          
           echo "########### VM status ################"
           kubectl get virtualmachine/quarkus-dev -oyaml
           
-          echo "########### Describe VM ################"
-          kubectl describe virtualmachine/quarkus-dev
+          #echo "########### Describe VM ################"
+          #kubectl describe virtualmachine/quarkus-dev
           
           echo "########### VMI status ################"
           kubectl get vmi -A -oyaml
