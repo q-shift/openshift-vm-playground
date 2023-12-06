@@ -219,7 +219,9 @@ jobs:
           echo "########### VM Importer pod ################"
           if kubectl get -n vm-images pod/importer-podman-remote &> /dev/null; then
            kubectl get -n vm-images pod/importer-podman-remote -oyaml
-           kubectl describe -n vm-images pod/importer-podman-remote         
+           kubectl describe -n vm-images pod/importer-podman-remote
+          else
+            echo "No pod/importer-podman-remote found"
           fi
           
           echo "########### VM status ################"
