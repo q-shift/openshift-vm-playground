@@ -9,7 +9,7 @@ spec:
     - name: debug
       value: "false"
     - name: deploy
-      value: "true"
+      value: "false"
     - name: url
       value: "https://github.com/iocanel/quarkus-helloworld"
     - name: virtualMachineName
@@ -24,3 +24,5 @@ spec:
     - name: maven-settings
       configMap:
         name: maven-settings
+    - name: dockerconfig-ws
+      emptyDir: {}

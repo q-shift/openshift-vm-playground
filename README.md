@@ -140,7 +140,7 @@ You can follow the pipeline execution using the following command:
 tkn pr logs quarkus-maven-build-run -f
 ```
 
-**NOTE**: If you experiment an issue with the `podman -r run`, you can then modify the `create-remote-container` included within the pipeline `quarkus-maven-build` and set the parameter `debug` to `true` within the PipelineRun `quarkus-maven-build-run`
+**NOTE**: If you experiment an issue when a container is created during the creation of a testcontainer, you can then modify the `create-remote-container` included within the pipeline `quarkus-maven-build` to and set the parameter `debug` to `true` within the PipelineRun `quarkus-maven-build-run`
 
 ### Replay the pipeline
 
