@@ -44,6 +44,12 @@ oc new-project <NAMESPACE>
 ```bash
 kubectl create secret generic quarkus-dev-ssh-key -n <NAMESPACE> --from-file=key=~/.ssh/<PUBLIC_KEY_FILE>.pub                  
 ```
+- Create the `DataVolume` on the cluster (which is a PVC) using the Fedora Quarkus Dev VM image pushed on: `quay.io/snowdrop/quarkus-dev-vm`
+```bash
+kubectl apply -n openshift-virtualization-os-images -f resources/quay-to-pvc-datavolume.yml
+```
+**NOTE**: This step should be performed only once. If you have already created the DataVolume, then you can skip this step and move to the next one.
+
 - When done, create a VirtualMachine
 ```bash
 kubectl delete -n <NAMESPACE> vm/quarkus-dev
