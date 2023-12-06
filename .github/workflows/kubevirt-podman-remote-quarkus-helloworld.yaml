@@ -142,9 +142,6 @@ jobs:
           cat <<EOF > config.json
           {
             "auths": {
-              "quay.io": {
-                "auth": "$encodeAuth"
-              },
               "quay.io/${{ env.QUAY_ORG }}": {
                 "auth": "$encodeAuth"
               }
