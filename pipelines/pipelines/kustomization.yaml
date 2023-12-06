@@ -13,7 +13,7 @@ patches:
         - package
         - '-DskipTests'
         - -B
-        - -Dquarkus.container-image.image=quay.io/snowdrop/quarkus-dev-vm:latest
+        - -Dquarkus.container-image.image=quay.io/snowdrop/quarkus-helloworld:latest
         - -Dquarkus.kubernetes.deploy=true
         - -Dquarkus.log.level=DEBUG
     target:
