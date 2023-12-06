@@ -238,6 +238,7 @@ jobs:
           
           echo "########### DataVolumes and PVC ################"
           kubectl get datavolume,pvc -A
+          kubectl describe datavolume/podman-remote -n vm-images
           
           echo "######### Tekton describe ################"
           tkn pipelinerun describe quarkus-maven-build
