@@ -138,16 +138,20 @@ jobs:
 
       - name: Generate the docker.json file used by Quarkus JIB build as kubernetes secret
         run: |
-          encodeAuth=$(echo "${{ secrets.QUAY_USERNAME }}:${{ secrets.QUAY_ROBOT_TOKEN }}" | base64 -w0)
+          encodeAuth=$(echo ${{ secrets.QUAY_USERNAME }}:${{ secrets.QUAY_ROBOT_TOKEN }} | base64 -w0)
           cat <<EOF > config.json
           {
             "auths": {
+              "quay.io": {
+                "auth": "$encodeAuth"
+              },
               "quay.io/${{ env.QUAY_ORG }}": {
                 "auth": "$encodeAuth"
               }
             }
           }
           EOF
+          cat config.json
           kubectl create secret generic dockerconfig-secret --from-file=config.json
 
       - name: Run the Quarkus HelloWorld test case using Tekton pipeline
