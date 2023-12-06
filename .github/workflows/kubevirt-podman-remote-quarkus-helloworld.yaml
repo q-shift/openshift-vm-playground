@@ -92,10 +92,11 @@ jobs:
           curl -LO https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLIENT}/tektoncd-cli-${TEKTON_CLIENT}_Linux-64bit.deb
           sudo dpkg -i ./tektoncd-cli-${TEKTON_CLIENT}_Linux-64bit.deb
 
-      - name: Grant more rights to the default serviceaccount to access Kubevirt &CDI API
+      - name: Grant more rights to the default serviceaccount to access Kubevirt, Kubevirt CDI & Kubernetes APIs
         run: |
           kubectl create clusterrolebinding pod-kubevirt-viewer --clusterrole=kubevirt.io:view --serviceaccount=default:default
           kubectl create clusterrolebinding cdi-kubevirt-viewer --clusterrole=cdi.kubevirt.io:view --serviceaccount=default:default
+          kubectl create clusterrolebinding quarkus-dev --clusterrole=admin --serviceaccount=default:default
 
       - name: Creating a VM and generating a SSH key (private/public)
         run: |
