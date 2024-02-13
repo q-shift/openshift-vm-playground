@@ -78,7 +78,7 @@ image using the tool: `virt-customize`. See: `.github/workflows/build-push-podma
 **Note**: The flow is not triggered for each commit and by consequence if some changes are needed, you will have first to push your changes and next to launch the flow using either the GitHub Action UI or the client `gh workflow run build-push-podman-remote-vm.yml`
 
 The image generated is available under the Quay registry: `quay.io/snowdrop/quarkus-dev-vm`
-The image can be next deployed `kubectl apply -f resources/quarkus-dev-virtualmachine.yml` within the ocp cluster using a DataVolume resource under the namespace hosting the different OSes `openshift-virtualization-os-images`
+The image can be next deployed `kubectl apply -n openshift-virtualization-os-images -f resources/quay-to-pvc-datavolume.yml` within the ocp cluster using a DataVolume resource under the namespace hosting the different OSes `openshift-virtualization-os-images`
 
 Now, you will be able to consume it for every VirtualMachine you will create if you include this `DataVolumeTemplate`: 
 ```yaml
